@@ -1,0 +1,36 @@
+# Python & Flask
+*.pyc
+*.pyo
+*.egg-info/
+__pycache__/
+venv/
+*.env  # If you're using environment variables
+
+# Node.js & React
+node_modules/
+package-lock.json
+yarn.lock
+build/
+*.log
+
+# VSCode
+.vscode/
+
+# OS-related
+.DS_Store  # macOS
+Thumbs.db  # Windows
+*.swp  # Linux (for Vim users)
+
+# Deployment
+*.pem  # AWS key-pairs
+*.credentials  # Any other credentials file
+
+# Miscellaneous
+*.log
+*.swo
+*.bak
+*.swp
+*.tar
+*.rar
+*.zip
+*.tmp
