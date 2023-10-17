@@ -11,6 +11,11 @@
             document.getElementById('messages').innerHTML += '<br>' + data;
         });
 
+        socket.on('lobby_update', function(updatedLobbies) {
+            console.log("Received lobby_update event", updatedLobbies);
+            renderLobbies(updatedLobbies);
+        });
+
         function sendMessage() {
             var message = document.getElementById('messageInput').value;
             socket.emit('send_message', message);
@@ -18,8 +23,117 @@
     </script>
 </head>
 <body>
-    <input type="text" id="messageInput">
-    <button onclick="sendMessage()">Send Message</button>
-    <div id="messages"></div>
+    <!-- User Registration and Login Section -->
+    <div id="userSection">
+        <input type="text" id="usernameInput" placeholder="Username">
+        <input type="password" id="passwordInput" placeholder="Password">
+        <button onclick="registerUser()">Register</button>
+        <button onclick="loginUser()">Login</button>
+    </div>
+
+    <!-- Lobby Section -->
+    <div id="lobbySection" style="display: none;">
+        <h2>Lobbies</h2>
+        <ul id="lobbies-list">
+            <!-- Lobbies will be listed here -->
+        </ul>
+        <button onclick="createLobby()">Create New Lobby</button>
+    </div>
+    
+    <!-- Chat Section -->
+    <div id="chatSection" style="display: none;">
+        <input type="text" id="messageInput" placeholder="Enter your message">
+        <button onclick="sendMessage()">Send Message</button>
+        <div id="messages"></div>
+    </div>
+    
+    <script type="text/javascript">
+        function registerUser() {
+            var username = document.getElementById('usernameInput').value;
+            var password = document.getElementById('passwordInput').value;
+
+            fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `username=${username}&password=${password}`
+            })
+            .then(response => response.text())
+            .then(data => alert(data))
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+        function loginUser() {
+            var username = document.getElementById('usernameInput').value;
+            var password = document.getElementById('passwordInput').value;
+
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `username=${username}&password=${password}`
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    // Display lobby section upon successful login
+                    document.getElementById('userSection').style.display = 'none';
+                    document.getElementById('lobbySection').style.display = 'block';
+                    fetchLobbies();  // Display lobbies
+                }
+                return response.text();
+            })
+            .then(data => alert(data))
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+        function createLobby() {
+            fetch('/create_lobby', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    fetchLobbies();
+                });
+        }
+
+        function joinLobby(lobbyId) {
+            fetch(`/join_lobby/${lobbyId}`, { method: 'POST' })
+                .then(response => {
+                    if (response.status === 403) {
+                        alert("Lobby is full!");
+                        return;
+                    }
+                return response.json();
+                })
+                .then(data => {
+                    if (data) {
+                        console.log(data);
+                    }
+                });
+        }
+
+        function fetchLobbies() {
+            fetch('/lobbies')
+                .then(response => response.json())
+                .then(data => {
+                    renderLobbies(data);
+                });
+        }
+
+        function renderLobbies(lobbiesData) {
+            const lobbiesList = document.getElementById('lobbies-list');
+            lobbiesList.innerHTML = "";
+            for (let lobbyId in lobbiesData) {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `Lobby ${lobbyId}: ${lobbiesData[lobbyId].join(", ")} <button onclick="joinLobby(${lobbyId})">Join</button>`;
+                lobbiesList.appendChild(listItem);
+            }
+        }
+    </script>
 </body>
 </html>
+
