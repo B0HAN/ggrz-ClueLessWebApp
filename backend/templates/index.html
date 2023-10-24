@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GGRZ Clue-Less</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='main.js') }}" defer></script>
+</head>
+<body>
+
+    <!-- User Registration and Login Section -->
+    <div id="userSection">
+        <input type="text" id="usernameInput" placeholder="Username">
+        <input type="password" id="passwordInput" placeholder="Password">
+        <button onclick="registerUser()">Register</button>
+        <button onclick="loginUser()">Login</button>
+    </div>
+
+    <!-- Lobby Section -->
+    <div id="lobbySection" style="display: none;">
+        <h2>Lobbies</h2>
+        <ul id="lobbies-list">
+            <!-- Lobbies will be listed here -->
+        </ul>
+        <button onclick="createLobby()">Create New Lobby</button>
+    </div>
+    
+    <!-- Chat Section -->
+    <div id="chatSection" style="display: none;">
+        <input type="text" id="messageInput" placeholder="Enter your message">
+        <button onclick="sendMessage()">Send Message</button>
+        <div id="messages"></div>
+    </div>
+
+</body>
+</html>
