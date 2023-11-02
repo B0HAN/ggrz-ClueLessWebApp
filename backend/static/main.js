@@ -3,18 +3,27 @@ var socket = io.connect('http://' + document.domain + ':' + location.port);
 var currentUsername = "";
 
 socket.on('broadcast_message', function(data) {
-    document.getElementById('messages').innerHTML += '<br>' + data;
+    document.getElementById('messagesBox').innerHTML += '<br>' + data;
 });
 
-socket.on('lobby_update', function(updatedLobbies) {
-    console.log("Received lobby_update event", updatedLobbies);
-    renderLobbies(updatedLobbies);
+// Socket event listener for player list updates
+socket.on('players_update', function(updatedPlayers) {
+    console.log("Received players_update event", updatedPlayers);
+    renderLobby(updatedPlayers);
+});
+
+socket.on('game_started', function() {
+    document.getElementById('lobbySection').style.display = 'none';
+    document.getElementById('gameSection').style.display = 'block';
 });
 
 // Message Sending Function
 function sendMessage() {
     var message = document.getElementById('messageInput').value;
-    socket.emit('send_message', {username: currentUsername, message: message});
+    if (message.trim() !== '') {
+        socket.emit('send_message', { username: currentUsername, message: message });
+        document.getElementById('messageInput').value = ''; // Clear input after sending
+    }
 }
 
 // User Registration Function
@@ -54,7 +63,7 @@ function loginUser() {
             document.getElementById('chatSection').style.display = 'block';
             document.getElementById('userSection').style.display = 'none';
             document.getElementById('lobbySection').style.display = 'block';
-            fetchLobbies();
+            fetchPlayersInLobby();
         }
         return response.text();
     })
@@ -63,19 +72,9 @@ function loginUser() {
         console.error('Error:', error);
     });
 }
-
-// Lobby Creation Function
-function createLobby() {
-    fetch('/create_lobby', { method: 'POST' })
-    .then(response => response.json())
-    .then(data => {
-        fetchLobbies();
-    });
-}
-
-// Join Lobby Function
-function joinLobby(lobbyId) {
-    fetch(`/join_lobby/${lobbyId}`, { method: 'POST' })
+// join Function
+function join() {
+    fetch('/join', { method: 'POST' })
     .then(response => {
         if (response.status === 403) {
             alert("Lobby is full!");
@@ -90,22 +89,54 @@ function joinLobby(lobbyId) {
     });
 }
 
-// Fetch Lobbies Function
-function fetchLobbies() {
-    fetch('/lobbies')
+
+function fetchPlayersInLobby() {
+    fetch('/get_players')
     .then(response => response.json())
     .then(data => {
-        renderLobbies(data);
+        renderLobby(data.players);
+    })
+    .catch((error) => {
+        console.error('Error fetching players in lobby:', error);
     });
 }
 
-// Render Lobbies Function
-function renderLobbies(lobbiesData) {
-    const lobbiesList = document.getElementById('lobbies-list');
-    lobbiesList.innerHTML = "";
-    for (let lobbyId in lobbiesData) {
-        const listItem = document.createElement('li');
-        listItem.innerHTML = `Lobby ${lobbyId}: ${lobbiesData[lobbyId].join(", ")} <button onclick="joinLobby(${lobbyId})">Join</button>`;
-        lobbiesList.appendChild(listItem);
+
+
+function renderLobby(playersData) {
+    const playerListDiv = document.getElementById('playersList');
+    playerListDiv.innerHTML = ""; // Clearing previous content
+    
+    if (playersData.length === 0) {
+        playerListDiv.innerHTML = "Lobby is currently empty!";
+    } else {
+        const playersList = document.createElement('ul');
+        playersData.forEach(player => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = player;
+            playersList.appendChild(listItem);
+        });
+        playerListDiv.appendChild(playersList);
     }
 }
+
+
+
+function startGame() {
+    fetch('/start_game', { method: 'POST' })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            alert("Game started!");
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        alert("An error occurred while trying to start the game.");
+    });
+}
+
+
+

@@ -12,7 +12,8 @@ def create_app():
 
     # In-memory databases
     users_db = {}  # {username: password}
-    lobbies = {}   # {lobby_id: [list_of_players]}
+    players_in_lobby = []
+
 
     # -----------------
     # Web Routes
@@ -40,30 +41,38 @@ def create_app():
             return 'Login successful!'
         return 'Invalid username or password!', 401
 
-    @app.route('/create_lobby', methods=['POST'])
-    def create_lobby():
-        lobby_id = len(lobbies) + 1
-        lobbies[lobby_id] = [session['username']]
-        socketio.emit('lobby_update', lobbies)
-        return jsonify({"lobby_id": lobby_id, "players": lobbies[lobby_id]})
-
-    @app.route('/join_lobby/<int:lobby_id>', methods=['POST'])
-    def join_lobby(lobby_id):
-        if lobby_id not in lobbies:
-            return "Lobby not found!", 404
-
-        if len(lobbies[lobby_id]) >= MAX_PLAYERS_PER_LOBBY:
+    @app.route('/join', methods=['POST'])
+    def join():
+        if session['username'] not in players_in_lobby:
+            if len(players_in_lobby) < MAX_PLAYERS_PER_LOBBY:
+                players_in_lobby.append(session['username'])
+                socketio.emit('players_update', players_in_lobby)
+                return jsonify({"players": players_in_lobby})
             return "Lobby is full!", 403
+        return "Already in the lobby!", 400
 
-        if session['username'] not in lobbies[lobby_id]:
-            lobbies[lobby_id].append(session['username'])
-            socketio.emit('lobby_update', lobbies) 
+    @app.route('/get_players', methods=['GET'])
+    def get_players():
+        return jsonify({"players": players_in_lobby})
 
-        return jsonify({"lobby_id": lobby_id, "players": lobbies[lobby_id]})
+    
+    @app.route('/start_game', methods=['POST'])
+    def handle_start_game():
+        # Ensure the user is logged in
+        if 'username' not in session:
+            return jsonify({"error": "User not logged in"}), 401
 
-    @app.route('/lobbies', methods=['GET'])
-    def get_lobbies():
-        return jsonify(lobbies)
+        # Check if the user trying to start the game is the first player in the lobby
+        if players_in_lobby[0] != session['username']:
+            return jsonify({"error": "You're not the first player in this lobby. Only the first player can start the game."}), 403
+
+        # Check for minimum number of players before starting the game
+        if len(players_in_lobby) < MIN_PLAYERS_PER_LOBBY:
+            return jsonify({"error": f"At least {MIN_PLAYERS_PER_LOBBY} players are required to start the game."}), 403
+
+        # If all checks passed, broadcast that the game has started
+        emit('game_started', namespace='/', broadcast=True)
+        return jsonify({"status": "Game started for lobby"})
 
     # -----------------
     # Socket Events
@@ -75,7 +84,7 @@ def create_app():
         message = data['message']
         formatted_message = f"{username}: {message}"
         emit('broadcast_message', formatted_message, broadcast=True)
-
+    
     return app
 
 app = create_app()
