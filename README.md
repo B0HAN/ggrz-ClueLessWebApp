@@ -1,5 +1,4 @@
 
-Of course! Here's the README for your Clue-Less WebApp:
 
 Clue-Less WebApp
 Description:
