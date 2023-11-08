@@ -9,6 +9,7 @@ class Space:
         self.neighbors.append(neighbor_space)
 
     def add_player(self, player):
+        """add player to a space"""
         self.current_players.append(player)
 
     def remove_player(self, player):
