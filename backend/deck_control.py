@@ -4,6 +4,9 @@ class Card:
     def __init__(self, name, card_type):
         self.name = name
         self.card_type = card_type  # This can be "Room", "Character", or "Weapon"
+    
+    def get_name(self):
+        return self.name
 
     def __str__(self):
         return f"{self.name} ({self.card_type})"
@@ -11,10 +14,10 @@ class Card:
 class Deck:
     def __init__(self):
         # Initiate the deck with all the cards
-        self.cards = self._initialize_deck()
+        self.cards = self._construct_deck()
         self.solution_cards = []
 
-    def _initialize_deck(self):
+    def _construct_deck(self):
         """Initialize the deck with all required cards."""
         # List all room names, character names, and weapon names
         rooms = ["Study", "Hall", "Lounge", "Library", "Billiard Room", "Dining Room", "Conservatory", "Ballroom", "Kitchen"]
@@ -29,14 +32,14 @@ class Deck:
         # Return the combined list of all cards
         return room_cards + character_cards + weapon_cards
     
-    def add_card(self, card):
-        self.cards.append(card)
-
+    def prepare_for_game(self):
+        """call this function to prepare the deck for the game, it will shuffle and hide 3 solution cards."""
+        self.shuffle()
+        self.set_solution_cards()
+        self.hide_solution_cards()
+    
     def shuffle(self):
         random.shuffle(self.cards)
-
-    def draw_card(self):
-        return self.cards.pop()
 
     def set_solution_cards(self): 
         """Randomly select a room, character, and weapon card as the solution."""
@@ -50,5 +53,17 @@ class Deck:
         for card in self.solution_cards:
             self.cards.remove(card)
 
+    def get_solution_cards(self):
+        """Get the solution cards for display or other purposes."""
+        return self.solution_cards
+
+    def add_card(self, card):
+        self.cards.append(card)
+
+
+    def draw_card(self):
+        return self.cards.pop()
+
+    
     def __str__(self):
         return ', '.join(str(card) for card in self.cards)

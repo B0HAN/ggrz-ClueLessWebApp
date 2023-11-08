@@ -1,127 +1,148 @@
 class Space:
     def __init__(self, name, space_type):
         self.name = name
+        self.space_type = space_type
         self.neighbors = []
-        self.type = space_type # Either Room or Hallway
-        self.occupants = []
-        self.max_occupants = float('inf') if self.type == "Room" else 1
-        
+        self.current_players = []
 
-    def addNeighbor(self, neighbor):
-        if neighbor not in self.neighbors:
-            self.neighbors.append(neighbor)
-            neighbor.addNeighbor(self)  # Ensure the relationship is bidirectional
-    
-    def can_accommodate(self):
-        """Check if the space can accommodate another player."""
-        return len(self.occupants) < self.max_occupants
-    
+    def addNeighbor(self, neighbor_space):
+        self.neighbors.append(neighbor_space)
+
     def add_player(self, player):
-        """Add a player to the space if possible."""
-        if self.can_accommodate():
-            self.occupants.append(player)
-        else:
-            raise ValueError(f"{self.name} cannot accommodate more players.")
-    
+        """add player to a space"""
+        self.current_players.append(player)
+
     def remove_player(self, player):
-        """Remove a player from the space."""
-        if player in self.occupants:
-            self.occupants.remove(player)
+        self.current_players.remove(player)
+
+    def can_accommodate(self):
+        # If it's a room, it can always accommodate more players.
+        if self.space_type == "Room":
+            return True
+        # If it's a hallway, it can only accommodate one player at a time.
+        elif self.space_type == "Hallway":
+            return len(self.current_players) == 0
 
     def __str__(self):
-        return f"Space({self.name})"
+        return self.name
 
 
 class Gameboard:
     def __init__(self):
         # Initialize all spaces
-        self.study = Space("Study", "Room")
-        self.kitchen = Space("Kitchen", "Room")
-        self.hall = Space("Hall", "Room")
-        self.lounge = Space("Lounge", "Room")
-        self.library = Space("Library", "Room")
-        self.billiardRoom = Space("BilliardRoom", "Room")
-        self.diningRoom = Space("DiningRoom", "Room")
-        self.conservatory = Space("Conservatory", "Room")
-        self.ballRoom = Space("BallRoom", "Room")
-        self.hallway_study_hall = Space("Hallway_Study_Hall", "Hallway")
-        self.hallway_study_library = Space("Hallway_Study_Library", "Hallway")
-        self.hallway_hall_lounge = Space("Hallway_Hall_Lounge", "Hallway")
-        self.hallway_hall_billiardRoom = Space("Hallway_Hall_BilliardRoom", "Hallway")
-        self.hallway_lounge_diningRoom = Space("Hallway_Lounge_DiningRoom", "Hallway")
-        self.hallway_library_billiardRoom = Space("Hallway_Library_BilliardRoom", "Hallway")
-        self.hallway_billiardRoom_diningRoom = Space("Hallway_BilliardRoom_DiningRoom", "Hallway")
-        self.hallway_library_conservatory = Space("Hallway_Library_Conservatory", "Hallway")
-        self.hallway_billiardRoom_ballRoom = Space("Hallway_BilliardRoom_BallRoom", "Hallway")
-        self.hallway_diningRoom_kitchen = Space("Hallway_DiningRoom_Kitchen", "Hallway")
-        self.hallway_conservatory_ballRoom = Space("Hallway_Conservatory_BallRoom", "Hallway")
-        self.hallway_ballRoom_kitchen = Space("Hallway_BallRoom_Kitchen", "Hallway")
+        self.spaces = {
+            "Study": Space("Study", "Room"),
+            "Kitchen": Space("Kitchen", "Room"),
+            "Hall": Space("Hall", "Room"),
+            "Lounge": Space("Lounge", "Room"),
+            "Library": Space("Library", "Room"),
+            "Billiard Room": Space("Billiard Room", "Room"),
+            "Dining Room": Space("Dining Room", "Room"),
+            "Conservatory": Space("Conservatory", "Room"),
+            "Ballroom": Space("Ballroom", "Room"),
+            "Hallway Study-Hall": Space("Hallway Study-Hall", "Hallway"),
+            "Hallway Study-Library": Space("Hallway Study-Library", "Hallway"),
+            "Hallway Hall-Lounge": Space("Hallway Hall-Lounge", "Hallway"),
+            "Hallway Hall-Billiard Room": Space("Hallway Hall-Billiard Room", "Hallway"),
+            "Hallway Lounge-Dining Room": Space("Hallway Lounge-Dining Room", "Hallway"),
+            "Hallway Library-Billiard Room": Space("Hallway Library-Billiard Room", "Hallway"),
+            "Hallway Billiard Room-Dining Room": Space("Hallway Billiard Room-Dining Room", "Hallway"),
+            "Hallway Library-Conservatory": Space("Hallway Library-Conservatory", "Hallway"),
+            "Hallway Billiard Room-Ballroom": Space("Hallway Billiard Room-Ballroom", "Hallway"),
+            "Hallway Dining Room-Kitchen": Space("Hallway Dining Room-Kitchen", "Hallway"),
+            "Hallway Conservatory-Ballroom": Space("Hallway Conservatory-Ballroom", "Hallway"),
+            "Hallway Ballroom-Kitchen": Space("Hallway Ballroom-Kitchen", "Hallway"),
+        }
+        
+        # Assign neighbors to each space
+        self._define_neighbors()
 
-        # Define neighbors based on the requirements
-        self.study.addNeighbor(self.kitchen)
-        self.study.addNeighbor(self.hallway_study_hall)
-        self.study.addNeighbor(self.hallway_study_library)
+    def _define_neighbors(self):
+        # Define neighbors for each space
+        self.spaces["Study"].addNeighbor(self.spaces["Hallway Study-Hall"])
+        self.spaces["Study"].addNeighbor(self.spaces["Hallway Study-Library"])
+        self.spaces["Study"].addNeighbor(self.spaces["Kitchen"])  # Assuming there's a secret passage
 
-        self.hallway_study_hall.addNeighbor(self.hall)
+        self.spaces["Hall"].addNeighbor(self.spaces["Hallway Study-Hall"])
+        self.spaces["Hall"].addNeighbor(self.spaces["Hallway Hall-Lounge"])
+        self.spaces["Hall"].addNeighbor(self.spaces["Hallway Hall-Billiard Room"])
 
-        self.hall.addNeighbor(self.hallway_study_hall)
-        self.hall.addNeighbor(self.hallway_hall_lounge)
-        self.hall.addNeighbor(self.hallway_hall_billiardRoom)
+        self.spaces["Lounge"].addNeighbor(self.spaces["Hallway Hall-Lounge"])
+        self.spaces["Lounge"].addNeighbor(self.spaces["Hallway Lounge-Dining Room"])
+        self.spaces["Lounge"].addNeighbor(self.spaces["Conservatory"])  # Assuming there's a secret passage
 
-        self.hallway_hall_lounge.addNeighbor(self.lounge)
+                # Continue defining neighbors
+        self.spaces["Library"].addNeighbor(self.spaces["Hallway Study-Library"])
+        self.spaces["Library"].addNeighbor(self.spaces["Hallway Library-Billiard Room"])
+        self.spaces["Library"].addNeighbor(self.spaces["Hallway Library-Conservatory"])
 
-        self.lounge.addNeighbor(self.hallway_hall_lounge)
-        self.lounge.addNeighbor(self.hallway_lounge_diningRoom)
-        self.lounge.addNeighbor(self.conservatory)
+        self.spaces["Billiard Room"].addNeighbor(self.spaces["Hallway Library-Billiard Room"])
+        self.spaces["Billiard Room"].addNeighbor(self.spaces["Hallway Hall-Billiard Room"])
+        self.spaces["Billiard Room"].addNeighbor(self.spaces["Hallway Billiard Room-Dining Room"])
+        self.spaces["Billiard Room"].addNeighbor(self.spaces["Hallway Billiard Room-Ballroom"])
+
+        self.spaces["Dining Room"].addNeighbor(self.spaces["Hallway Lounge-Dining Room"])
+        self.spaces["Dining Room"].addNeighbor(self.spaces["Hallway Billiard Room-Dining Room"])
+        self.spaces["Dining Room"].addNeighbor(self.spaces["Hallway Dining Room-Kitchen"])
+
+        self.spaces["Conservatory"].addNeighbor(self.spaces["Hallway Library-Conservatory"])
+        self.spaces["Conservatory"].addNeighbor(self.spaces["Hallway Conservatory-Ballroom"])
+        self.spaces["Conservatory"].addNeighbor(self.spaces["Lounge"])  # Secret passage
+
+        self.spaces["Ballroom"].addNeighbor(self.spaces["Hallway Conservatory-Ballroom"])
+        self.spaces["Ballroom"].addNeighbor(self.spaces["Hallway Billiard Room-Ballroom"])
+        self.spaces["Ballroom"].addNeighbor(self.spaces["Hallway Ballroom-Kitchen"])
+
+        self.spaces["Kitchen"].addNeighbor(self.spaces["Hallway Ballroom-Kitchen"])
+        self.spaces["Kitchen"].addNeighbor(self.spaces["Hallway Dining Room-Kitchen"])
+        self.spaces["Kitchen"].addNeighbor(self.spaces["Study"])  # Secret passage
+
+        # Define the neighbor relationships for hallways
+        self.spaces["Hallway Study-Hall"].addNeighbor(self.spaces["Study"])
+        self.spaces["Hallway Study-Hall"].addNeighbor(self.spaces["Hall"])
+
+        self.spaces["Hallway Study-Library"].addNeighbor(self.spaces["Study"])
+        self.spaces["Hallway Study-Library"].addNeighbor(self.spaces["Library"])
+
+        self.spaces["Hallway Hall-Lounge"].addNeighbor(self.spaces["Hall"])
+        self.spaces["Hallway Hall-Lounge"].addNeighbor(self.spaces["Lounge"])
+
+        self.spaces["Hallway Ballroom-Kitchen"].addNeighbor(self.spaces["Ballroom"])
+        self.spaces["Hallway Ballroom-Kitchen"].addNeighbor(self.spaces["Kitchen"])
+
+        self.spaces["Hallway Library-Billiard Room"].addNeighbor(self.spaces["Library"])
+        self.spaces["Hallway Library-Billiard Room"].addNeighbor(self.spaces["Billiard Room"])
+
+        self.spaces["Hallway Hall-Billiard Room"].addNeighbor(self.spaces["Hall"])
+        self.spaces["Hallway Hall-Billiard Room"].addNeighbor(self.spaces["Billiard Room"])
+
+        self.spaces["Hallway Lounge-Dining Room"].addNeighbor(self.spaces["Lounge"])
+        self.spaces["Hallway Lounge-Dining Room"].addNeighbor(self.spaces["Dining Room"])
+
+        self.spaces["Hallway Billiard Room-Dining Room"].addNeighbor(self.spaces["Billiard Room"])
+        self.spaces["Hallway Billiard Room-Dining Room"].addNeighbor(self.spaces["Dining Room"])
+
+        self.spaces["Hallway Library-Conservatory"].addNeighbor(self.spaces["Library"])
+        self.spaces["Hallway Library-Conservatory"].addNeighbor(self.spaces["Conservatory"])
+
+        self.spaces["Hallway Billiard Room-Ballroom"].addNeighbor(self.spaces["Billiard Room"])
+        self.spaces["Hallway Billiard Room-Ballroom"].addNeighbor(self.spaces["Ballroom"])
+
+        self.spaces["Hallway Dining Room-Kitchen"].addNeighbor(self.spaces["Dining Room"])
+        self.spaces["Hallway Dining Room-Kitchen"].addNeighbor(self.spaces["Kitchen"])
+
+        self.spaces["Hallway Conservatory-Ballroom"].addNeighbor(self.spaces["Conservatory"])
+        self.spaces["Hallway Conservatory-Ballroom"].addNeighbor(self.spaces["Ballroom"])
 
 
-        self.hallway_study_library.addNeighbor(self.library)
 
-        self.hallway_hall_billiardRoom.addNeighbor(self.billiardRoom)
-
-        self.hallway_lounge_diningRoom.addNeighbor(self.diningRoom)
-
-        self.library.addNeighbor(self.hallway_study_library)
-        self.library.addNeighbor(self.hallway_library_billiardRoom)
-        self.library.addNeighbor(self.hallway_library_conservatory)
-
-        self.hallway_library_billiardRoom.addNeighbor(self.billiardRoom)
-
-        self.billiardRoom.addNeighbor(self.hallway_library_billiardRoom)
-        self.billiardRoom.addNeighbor(self.hallway_hall_billiardRoom)
-        self.billiardRoom.addNeighbor(self.hallway_billiardRoom_diningRoom)
-        self.billiardRoom.addNeighbor(self.hallway_billiardRoom_ballRoom)
-
-        self.hallway_billiardRoom_diningRoom.addNeighbor(self.diningRoom)
-
-        self.diningRoom.addNeighbor(self.hallway_lounge_diningRoom)
-        self.diningRoom.addNeighbor(self.hallway_billiardRoom_diningRoom)
-        self.diningRoom.addNeighbor(self.hallway_diningRoom_kitchen)
-
-        self.hallway_library_conservatory.addNeighbor(self.conservatory)
-
-        self.hallway_billiardRoom_ballRoom.addNeighbor(self.ballRoom)
-
-        self.hallway_diningRoom_kitchen.addNeighbor(self.kitchen)
-
-        self.conservatory.addNeighbor(self.hallway_library_conservatory)
-        self.conservatory.addNeighbor(self.hallway_conservatory_ballRoom)
-        self.conservatory.addNeighbor(self.lounge)
-
-        self.hallway_conservatory_ballRoom.addNeighbor(self.ballRoom)
-
-        self.ballRoom.addNeighbor(self.hallway_conservatory_ballRoom)
-        self.ballRoom.addNeighbor(self.hallway_billiardRoom_ballRoom)
-        self.ballRoom.addNeighbor(self.hallway_ballRoom_kitchen)
-
-        self.kitchen.addNeighbor(self.hallway_ballRoom_kitchen)
-        self.kitchen.addNeighbor(self.hallway_diningRoom_kitchen)
-        self.kitchen.addNeighbor(self.study)
-
-    # for testing if the graph is correct
     def displayGraph(self):
-        spaces = [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]
-        for space_name in spaces:
-            space = getattr(self, space_name)
-            print(f"{space} -> {[str(neighbor) for neighbor in space.neighbors]}")
+        # Display the graph for testing purposes
+        for space_name, space in self.spaces.items():
+            neighbors_names = [neighbor.name for neighbor in space.neighbors]
+            print(f"{space_name} -> {neighbors_names}")
+
+
+
+
 
