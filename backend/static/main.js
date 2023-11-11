@@ -179,7 +179,7 @@ img.onload = function() {
     div.appendChild(img);
 }; 
    
-img.src = 'https://d2vlcm61l7u1fs.cloudfront.net/media%2F1b1%2F1b19441d-2416-42f9-ab97-0d54a9085010%2Fphph4qs9F.png'; 
+img.src = staticBasePath + 'gameboard.png'; 
 
 function selectionMessage(inputMessage) {
     var message = currentUsername + inputMessage;
