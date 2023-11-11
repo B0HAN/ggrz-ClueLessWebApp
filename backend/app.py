@@ -75,8 +75,9 @@ def create_app():
         emit('game_started', namespace='/', broadcast=True)
         #start game
         curr_game = Game(players_in_lobby)
-        initial_game_state = curr_game.get_game_status
-        print("Initial Game State:\n " + initial_game_state);
+        initial_game_state = curr_game.get_game_status()
+        print("Initial Game State:\n ")
+        print(initial_game_state)
         return jsonify({"status": "Game started for lobby"})
 
     # -----------------
