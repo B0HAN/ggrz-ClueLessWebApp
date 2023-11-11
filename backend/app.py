@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify, session
 from flask_socketio import SocketIO, emit
+from game import Game
 
 # Constants
 MAX_PLAYERS_PER_LOBBY = 6
@@ -72,6 +73,10 @@ def create_app():
 
         # If all checks passed, broadcast that the game has started
         emit('game_started', namespace='/', broadcast=True)
+        #start game
+        curr_game = Game(players_in_lobby)
+        initial_game_state = curr_game.get_game_status
+        printf("Initial Game State:\n " + initial_game_state);
         return jsonify({"status": "Game started for lobby"})
 
     # -----------------
