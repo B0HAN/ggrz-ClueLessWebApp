@@ -190,7 +190,8 @@ function selectionMessage(inputMessage) {
 }
 
 function moveMessage() {
-    selectionMessage(" chose to move");
+    move = document.getElementById('moveToPlace').value;
+    selectionMessage(" chose to move to " + move);
 }
 
 function suggestionMessage() {
@@ -205,4 +206,8 @@ function accusationMessage() {
     place = document.getElementById('place').value;
     weapon = document.getElementById('weapon').value;
     selectionMessage(" is accusing " + suspect + " in " + place + " with the " + weapon);
+}
+
+function endTurnMessage() {
+    selectionMessage(" is ending their turn");
 }
