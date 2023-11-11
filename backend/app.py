@@ -76,7 +76,7 @@ def create_app():
         #start game
         curr_game = Game(players_in_lobby)
         initial_game_state = curr_game.get_game_status
-        printf("Initial Game State:\n " + initial_game_state);
+        print("Initial Game State:\n " + initial_game_state);
         return jsonify({"status": "Game started for lobby"})
 
     # -----------------
