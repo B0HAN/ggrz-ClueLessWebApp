@@ -181,4 +181,28 @@ img.onload = function() {
    
 img.src = 'https://d2vlcm61l7u1fs.cloudfront.net/media%2F1b1%2F1b19441d-2416-42f9-ab97-0d54a9085010%2Fphph4qs9F.png'; 
 
+function selectionMessage(inputMessage) {
+    var message = currentUsername + inputMessage;
+    if (message.trim() !== '') {
+        socket.emit('send_message', { username: "System", message: message });
+        document.getElementById('messageInput').value = ''; // Clear input after sending
+    }
+}
 
+function moveMessage() {
+    selectionMessage(" chose to move");
+}
+
+function suggestionMessage() {
+    suspect = document.getElementById('suspect').value;
+    place = document.getElementById('place').value;
+    weapon = document.getElementById('weapon').value;
+    selectionMessage(" suggests it is " + suspect + " in " + place + " with the " + weapon);
+}
+
+function accusationMessage() {
+    suspect = document.getElementById('suspect').value;
+    place = document.getElementById('place').value;
+    weapon = document.getElementById('weapon').value;
+    selectionMessage(" is accusing " + suspect + " in " + place + " with the " + weapon);
+}
