@@ -41,20 +41,42 @@
 
     <!-- Game Section -->
     <div id="gameSection" style="display: none;">
+
         <h2>Welcome to the Game!</h2>
         <p>This is your game area. Once the game starts, all the game-related content and interactions will be available here.</p>
     
         <!-- Sample game content -->
-        <div class="game-content">
-            <h3>Game Instructions:</h3>
-            <ul>
-                <li>Step 1: Do this.</li>
-                <li>Step 2: Do that.</li>
-                <li>Step 3: Win the game!</li>
-            </ul>
+        <div id="image"></div>
+        <div class="game-content" style="display: flex;">
+            <div style="flex-grow: 1">
+                <h3>Game Instructions:</h3>
+                <ul>
+                    <li>Step 1: Do this.</li>
+                    <li>Step 2: Do that.</li>
+                    <li>Step 3: Win the game!</li>
+                </ul>
+            </div>
+            <div style="flex-grow: 1">
+                <h3>Current Players Turn:</h3>
+            </div>
         </div>
         
         <!-- You can add buttons, game canvas, scoreboards, etc. here -->
+        
+
+        <div class="playerUtils" style="display: flex;">
+            <div style="flex-grow: 1">
+                <h3>Players:</h3>
+                <div id="playersInGameList"></div>
+            </div>
+
+            <div style="flex-grow: 1">
+                <h3>Your Cards:</h3>
+            </div>
+        </div>
+
+
+
         
     </div>
     

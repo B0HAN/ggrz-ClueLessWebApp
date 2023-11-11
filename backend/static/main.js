@@ -15,6 +15,7 @@ socket.on('players_update', function(updatedPlayers) {
 socket.on('game_started', function() {
     document.getElementById('lobbySection').style.display = 'none';
     document.getElementById('gameSection').style.display = 'block';
+    fetchPlayersInGame();
 });
 
 // Message Sending Function
@@ -130,6 +131,7 @@ function startGame() {
             alert(data.error);
         } else {
             alert("Game started!");
+            img.onload();
         }
     })
     .catch((error) => {
@@ -138,5 +140,45 @@ function startGame() {
     });
 }
 
+// I don't know how to get the players from that same ID so I copied fetchPlayersInLobby
+function fetchPlayersInGame() {
+    fetch('/get_players')
+    .then(response => response.json())
+    .then(data => {
+        getPlayerInGame(data.players);
+    })
+    .catch((error) => {
+        console.error('Error fetching players in lobby:', error);
+    });
+}
+
+// I don't know how to get the players from that same ID so I copied renderLobby and renamed the IDs
+function getPlayerInGame(playersData) {
+    const playerListGameDiv = document.getElementById('playersInGameList');
+    playerListGameDiv.innerHTML = ""; // Clearing previous content
+    
+    if (playersData.length === 0) {
+        playerListGameDiv.innerHTML = "Lobby is currently empty!";
+    } else {
+        const playersInGameList = document.createElement('ul');
+        playersData.forEach(player => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = player;
+            playersInGameList.appendChild(listItem);
+        });
+        playerListGameDiv.appendChild(playersInGameList);
+    }
+}
+
+
+// loads the image
+var img = new Image(); 
+var div = document.getElementById("image"); 
+
+img.onload = function() { 
+    div.appendChild(img);
+}; 
+   
+img.src = 'https://d2vlcm61l7u1fs.cloudfront.net/media%2F1b1%2F1b19441d-2416-42f9-ab97-0d54a9085010%2Fphph4qs9F.png'; 
 
 
