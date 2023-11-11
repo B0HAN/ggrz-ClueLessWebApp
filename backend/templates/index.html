@@ -2,27 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Message Broadcast System</title>
+    <title>GGRZ Clue-Less</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-    <script type="text/javascript">
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
-
-        socket.on('broadcast_message', function(data) {
-            document.getElementById('messages').innerHTML += '<br>' + data;
-        });
-
-        socket.on('lobby_update', function(updatedLobbies) {
-            console.log("Received lobby_update event", updatedLobbies);
-            renderLobbies(updatedLobbies);
-        });
-
-        function sendMessage() {
-            var message = document.getElementById('messageInput').value;
-            socket.emit('send_message', message);
-        }
-    </script>
+    <script src="{{ url_for('static', filename='main.js') }}" defer></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='chatbox.css') }}">
 </head>
 <body>
+    <h1>GGRZ Clue-Less</h1>
     <!-- User Registration and Login Section -->
     <div id="userSection">
         <input type="text" id="usernameInput" placeholder="Username">
@@ -33,107 +19,44 @@
 
     <!-- Lobby Section -->
     <div id="lobbySection" style="display: none;">
-        <h2>Lobbies</h2>
-        <ul id="lobbies-list">
-            <!-- Lobbies will be listed here -->
-        </ul>
-        <button onclick="createLobby()">Create New Lobby</button>
+        <h2>Main Lobby</h2>
+        <p>Welcome to the main lobby! You can start or join a game.</p>
+        <!-- Join and Start buttons are always in the lobby -->
+        <button id="joinButton" onclick="join()">Join</button>
+        <button id="startButton" onclick="startGame()">Start</button>
+        <div id="playersList"></div>
     </div>
     
     <!-- Chat Section -->
     <div id="chatSection" style="display: none;">
+        <!-- This is the message box where messages will be displayed -->
+        <div id="messagesBox"></div>
+
+        <!-- This is the input area and button, placed outside the message box -->
         <input type="text" id="messageInput" placeholder="Enter your message">
         <button onclick="sendMessage()">Send Message</button>
-        <div id="messages"></div>
+    </div>
+
+
+
+    <!-- Game Section -->
+    <div id="gameSection" style="display: none;">
+        <h2>Welcome to the Game!</h2>
+        <p>This is your game area. Once the game starts, all the game-related content and interactions will be available here.</p>
+    
+        <!-- Sample game content -->
+        <div class="game-content">
+            <h3>Game Instructions:</h3>
+            <ul>
+                <li>Step 1: Do this.</li>
+                <li>Step 2: Do that.</li>
+                <li>Step 3: Win the game!</li>
+            </ul>
+        </div>
+        
+        <!-- You can add buttons, game canvas, scoreboards, etc. here -->
+        
     </div>
     
-    <script type="text/javascript">
-        function registerUser() {
-            var username = document.getElementById('usernameInput').value;
-            var password = document.getElementById('passwordInput').value;
-
-            fetch('/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `username=${username}&password=${password}`
-            })
-            .then(response => response.text())
-            .then(data => alert(data))
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-        }
-
-        function loginUser() {
-            var username = document.getElementById('usernameInput').value;
-            var password = document.getElementById('passwordInput').value;
-
-            fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `username=${username}&password=${password}`
-            })
-            .then(response => {
-                if (response.status === 200) {
-                    // Display lobby section upon successful login
-                    document.getElementById('userSection').style.display = 'none';
-                    document.getElementById('lobbySection').style.display = 'block';
-                    fetchLobbies();  // Display lobbies
-                }
-                return response.text();
-            })
-            .then(data => alert(data))
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-        }
-
-        function createLobby() {
-            fetch('/create_lobby', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    fetchLobbies();
-                });
-        }
-
-        function joinLobby(lobbyId) {
-            fetch(`/join_lobby/${lobbyId}`, { method: 'POST' })
-                .then(response => {
-                    if (response.status === 403) {
-                        alert("Lobby is full!");
-                        return;
-                    }
-                return response.json();
-                })
-                .then(data => {
-                    if (data) {
-                        console.log(data);
-                    }
-                });
-        }
-
-        function fetchLobbies() {
-            fetch('/lobbies')
-                .then(response => response.json())
-                .then(data => {
-                    renderLobbies(data);
-                });
-        }
-
-        function renderLobbies(lobbiesData) {
-            const lobbiesList = document.getElementById('lobbies-list');
-            lobbiesList.innerHTML = "";
-            for (let lobbyId in lobbiesData) {
-                const listItem = document.createElement('li');
-                listItem.innerHTML = `Lobby ${lobbyId}: ${lobbiesData[lobbyId].join(", ")} <button onclick="joinLobby(${lobbyId})">Join</button>`;
-                lobbiesList.appendChild(listItem);
-            }
-        }
-    </script>
 </body>
 </html>
-
