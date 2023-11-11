@@ -41,20 +41,97 @@
 
     <!-- Game Section -->
     <div id="gameSection" style="display: none;">
+
         <h2>Welcome to the Game!</h2>
         <p>This is your game area. Once the game starts, all the game-related content and interactions will be available here.</p>
     
         <!-- Sample game content -->
-        <div class="game-content">
-            <h3>Game Instructions:</h3>
-            <ul>
-                <li>Step 1: Do this.</li>
-                <li>Step 2: Do that.</li>
-                <li>Step 3: Win the game!</li>
-            </ul>
+        <div id="image"></div>
+        <div class="game-content" style="display: flex;">
+            <div style="flex-grow: 1">
+                <h3>Game Instructions:</h3>
+                <ul>
+                    <li>Your turn can consist of:</li>
+                    <ul>
+                        <li>    Moving your character and</li>
+                        <li>    Making a suggestion and</li>
+                        <li>    Making an accusation</li>
+                        <li>    Then end turn</li>
+                    </ul>
+                    <li>To win:</li>
+                    <ul>
+                        <li>    Make a correct accusation</li>
+                    </ul>
+                </ul>
+            </div>
+            <div style="flex-grow: 1">
+                <h3>Current Players Turn:</h3>
+                <!-- <div id="currentPlayersTurn"></div> -->
+                <div style="display: flex">
+                    <div style="flex-grow: 1">
+                        <button onclick="moveMessage()">Move</button>
+                    </div>
+                    <div style="flex-grow: 1">
+                        <button onclick="suggestionMessage()">Make Suggestion</button>
+                    </div>
+                    <div style="flex-grow: 1">
+                        <button onclick="accusationMessage()">Make Accusation</button>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- You can add buttons, game canvas, scoreboards, etc. here -->
+        
+
+        <div class="playerUtils" style="display: flex;">
+            <div style="flex-grow: 1">
+                <h3>Players:</h3>
+                <div id="playersInGameList"></div>
+            </div>
+
+            <div style="flex-grow: 1">
+                <h3>Character locations:</h3>
+            </div>
+
+            <div style="flex-grow: 1">
+                <h3>Your Cards:</h3>
+            </div>
+        </div>
+
+        <div class="personPlaceThing">
+            <label for="suspect">Choose a suspect:</label>
+            <select name="suspect" id="suspect">
+                <option value="Miss Scarlet">Miss Scarlet</option>
+                <option value="Colonel Mustard">Colonel Mustard</option>
+                <option value="Mrs. White">Mrs. White</option>
+                <option value="Mr. Green">Mr. Green</option>
+                <option value="Mrs. Peacock">Mrs. Peacock</option>
+                <option value="Professor Plum">Professor Plum</option>
+            </select>
+            <label for="place">Choose a place:</label>
+            <select name="place" id="place">
+                <option value="Study">Study</option>
+                <option value="Kitchen">Kitchen</option>
+                <option value="Hall">Hall</option>
+                <option value="Lounge">Lounge</option>
+                <option value="Library">Library</option>
+                <option value="Billiard Room">Billiard Room</option>
+                <option value="Dining Room">Dining Room</option>
+                <option value="Conservatory">Conservatory</option>
+                <option value="Ballroom">Ballroom</option>
+            </select>
+            <label for="weapon">Choose a weapon:</label>
+            <select name="weapon" id="weapon">
+                <option value="Rope">Rope</option>
+                <option value="Lead Pipe">Lead Pipe</option>
+                <option value="Knife">Knife</option>
+                <option value="Wrench">Wrench</option>
+                <option value="Candlestick">Candlestick</option>
+                <option value="Revolver">Revolver</option>
+            </select>
+        </div>
+
         
     </div>
     
