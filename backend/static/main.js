@@ -179,7 +179,7 @@ img.onload = function() {
     div.appendChild(img);
 }; 
    
-img.src = 'https://d2vlcm61l7u1fs.cloudfront.net/media%2F1b1%2F1b19441d-2416-42f9-ab97-0d54a9085010%2Fphph4qs9F.png'; 
+img.src = staticBasePath + 'gameboard.png'; 
 
 function selectionMessage(inputMessage) {
     var message = currentUsername + inputMessage;
@@ -190,7 +190,8 @@ function selectionMessage(inputMessage) {
 }
 
 function moveMessage() {
-    selectionMessage(" chose to move");
+    move = document.getElementById('moveToPlace').value;
+    selectionMessage(" chose to move to " + move);
 }
 
 function suggestionMessage() {
@@ -205,4 +206,8 @@ function accusationMessage() {
     place = document.getElementById('place').value;
     weapon = document.getElementById('weapon').value;
     selectionMessage(" is accusing " + suspect + " in " + place + " with the " + weapon);
+}
+
+function endTurnMessage() {
+    selectionMessage(" is ending their turn");
 }

@@ -6,6 +6,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script src="{{ url_for('static', filename='main.js') }}" defer></script>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='chatbox.css') }}">
+    <script type="text/javascript">var staticBasePath = "{{ url_for('static', filename='') }}";</script>
 </head>
 <body>
     <h1>GGRZ Clue-Less</h1>
@@ -77,6 +78,9 @@
                     <div style="flex-grow: 1">
                         <button onclick="accusationMessage()">Make Accusation</button>
                     </div>
+                    <div style="flex-grow: 1">
+                        <button onclick="endTurnMessage()">End Turn</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -99,6 +103,38 @@
             </div>
         </div>
 
+        <h3>Make a suggestion/accusation:</h3>
+        <div class="makeAMove">
+            <label for="moveToPlace">Choose a place to move to:</label>
+            <select name="moveToPlace" id="moveToPlace">
+                <optgroup label="Rooms">
+                    <option value="Study">Study</option>
+                    <option value="Kitchen">Kitchen</option>
+                    <option value="Hall">Hall</option>
+                    <option value="Lounge">Lounge</option>
+                    <option value="Library">Library</option>
+                    <option value="Billiard Room">Billiard Room</option>
+                    <option value="Dining Room">Dining Room</option>
+                    <option value="Conservatory">Conservatory</option>
+                    <option value="Ballroom">Ballroom</option>
+                </optgroup>
+                <optgroup label="Hallways">
+                    <option value="Hallway Study-Hall">Hallway Study-Hall</option>
+                    <option value="Hallway Study-Library">Hallway Study-Library</option>
+                    <option value="Hallway Hall-Lounge">Hallway Hall-Lounge</option>
+                    <option value="Hallway Hall-Billiard Room">Hallway Hall-Billiard Room</option>
+                    <option value="Hallway Lounge-Dining Room">Hallway Lounge-Dining Room</option>
+                    <option value="Hallway Library-Billiard Room">Hallway Library-Billiard Room</option>
+                    <option value="Hallway Billiard Room-Dining Room">Hallway Billiard Room-Dining Room</option>
+                    <option value="Hallway Library-Conservatory">Hallway Library-Conservatory</option>
+                    <option value="Hallway Billiard Room-Ballroom">Hallway Billiard Room-Ballroom</option>
+                    <option value="Hallway Dining Room-Kitchen">Hallway Dining Room-Kitchen</option>
+                    <option value="Hallway Conservatory-Ballroom">Hallway Conservatory-Ballroom</option>
+                    <option value="Hallway Ballroom-Kitchen">Hallway Ballroom-Kitchen</option>
+                </optgroup>
+            </select>
+        
+        <h3>Make a suggestion/accusation:</h3>
         <div class="personPlaceThing">
             <label for="suspect">Choose a suspect:</label>
             <select name="suspect" id="suspect">
@@ -132,7 +168,6 @@
             </select>
         </div>
 
-        
     </div>
     
 </body>

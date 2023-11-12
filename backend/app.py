@@ -74,15 +74,36 @@ def create_app():
         # If all checks passed, broadcast that the game has started
         emit('game_started', namespace='/', broadcast=True)
         #start game
+        global curr_game
         curr_game = Game(players_in_lobby)
+        #logs
         initial_game_state = curr_game.get_game_status()
         print("Initial Game State:\n ")
         print(initial_game_state)
         return jsonify({"status": "Game started for lobby"})
-
+    
     # -----------------
     # Socket Events
     # -----------------
+    @socketio.on('move_player')
+    def valid_move(move_data):
+        username = move_data['username']
+        destination = move_data['destination']
+        player = curr_game.current_player()
+        if(player.__str__() == username):
+            if(curr_game.move_player(player, destination) == True):
+                message = username + "moved to" + destination
+                emit('broadcast_message', message, broadcast=True)
+            else:
+                message = destination + " is not avaliable to move."
+                emit('broadcast_message', message, broadcast=True)
+        else:
+            emit('broadcast_message', 'IVALID MOVE: It is not your turn.', broadcast=True)
+
+    @socketio.on('end_turn')
+    def next_player():
+
+    
 
     @socketio.on('send_message')
     def handle_message(data):

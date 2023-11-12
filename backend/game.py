@@ -118,10 +118,12 @@ class Game:
                 player.move(new_space)
                 new_space.add_player(player)
                 print(f"{player.name} has moved to {new_space.name}.")
+                return True
             else:
                 print(f"{new_space.name} cannot accommodate more players.")
         else:
             print("Invalid space name.")
+        return False
 
     def get_game_status(self):
         """Retrieve the status of the game, including player details."""
