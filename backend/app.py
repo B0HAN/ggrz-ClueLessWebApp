@@ -102,7 +102,7 @@ def create_app():
             else:
                 emit('broadcast_message', message, broadcast=True)
         else:
-            emit('broadcast_message', 'IVALID MOVE: It is not your turn.', broadcast=False)
+            emit('broadcast_message', 'INVALID MOVE: It is not your turn.', broadcast=False)
 
     @socketio.on('end_turn')
     def endTurn(user_data):
@@ -114,7 +114,7 @@ def create_app():
             message = player.name + " has ended their turn\n It is now " + new_player.name + " turn.\n"
             emit('broadcast_message', message, broadcast=True)
         else:
-            emit('broadcast_message', 'IVALID MOVE: It is not your turn.', broadcast=False)
+            emit('broadcast_message', 'INVALID MOVE: It is not your turn.', broadcast=False)
         game_state = curr_game.get_game_status()
         print(" ========= CURRENT GAME STATE: \n")
         print(game_state)
