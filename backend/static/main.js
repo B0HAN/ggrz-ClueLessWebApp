@@ -189,25 +189,25 @@ function selectionMessage(inputMessage) {
     }
 }
 
-function moveMessage() {
-    move = document.getElementById('moveToPlace').value;
-    selectionMessage(" chose to move to " + move);
+function movePlayer() {
+    var location = document.getElementById('moveToPlace').value;
+    socket.emit('move_player', { username: currentUsername, destination: location });
 }
 
 function suggestionMessage() {
-    suspect = document.getElementById('suspect').value;
-    place = document.getElementById('place').value;
-    weapon = document.getElementById('weapon').value;
-    selectionMessage(" suggests it is " + suspect + " in " + place + " with the " + weapon);
+    var player = document.getElementById('suspect').value;
+    var place = document.getElementById('place').value;
+    var item = document.getElementById('weapon').value;
+    socket.emit('make_suggestion', { username: currentUsername, suspect: player, location: place, weapon: item });
 }
 
 function accusationMessage() {
-    suspect = document.getElementById('suspect').value;
-    place = document.getElementById('place').value;
-    weapon = document.getElementById('weapon').value;
-    selectionMessage(" is accusing " + suspect + " in " + place + " with the " + weapon);
+    var player = document.getElementById('suspect').value;
+    var place = document.getElementById('place').value;
+    var item = document.getElementById('weapon').value;
+    socket.emit('make_accusation', { username: currentUsername, suspect: player, location: place, weapon: item });
 }
 
 function endTurnMessage() {
-    selectionMessage(" is ending their turn");
+    socket.emit('end_turn', { username: currentUsername});
 }

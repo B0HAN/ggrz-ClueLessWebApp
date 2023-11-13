@@ -9,7 +9,7 @@ class Game:
         self.gameboard = Gameboard()
         self.deck = Deck()
         self.deck.prepare_for_game()  # Shuffle, draw solution, and hide solution cards
-        self.solution = self.deck.solution_cards
+        self.solution = self.deck.get_solution_cards()
         self.game_over = False
         self.character_birthplaces = {
             "Miss Scarlet": "Hallway Hall-Lounge",
@@ -39,6 +39,15 @@ class Game:
             player.current_space = birthplace_space
             birthplace_space.add_player(player)
 
+    def removePlayerFromSpace(self, playerObject: Player, spaceObject: Space):
+        if spaceObject.space_type == "Hallway":
+            spaceObject.current_players = []
+            print("Player removed from " + spaceObject.name)
+        else:
+            #bug player not being removed from rooms properly
+            spaceObject.remove_player(playerObject)
+            print(playerObject.name + "removed from " + spaceObject.name)    
+    
     def next_turn(self):
         # Increment the player index
         self.current_player_index += 1
@@ -64,66 +73,93 @@ class Game:
         for player in self.players:
             if player.character == character_name:
                 return player
-        return None  # If no player has the character, which shouldn't happen
+        return None
+        # If no player has the character, which shouldn't happen
+    def removePlayerfromRotation(self, player_name):
+        list_players = self.players
+        print(" TOTAL PLAYERS:" + str(len(list_players)))
+        for i in range(len(list_players)):
+            curr_player = list_players[i]
+            if curr_player.name == player_name:
+                self.players.remove(curr_player)
+                player_count = len(self.players)
+                print(curr_player.name + "was removed. New number of player is: " + str(player_count))
+                break
 
     def player_makes_suggestion(self, player: Player, suggested_character, suggested_weapon):
+        result = ""
         """Handle a player's suggestion, ensuring the player is in a room."""
         # Check if the player is in a room
         if player.current_space.space_type != "Room":
-            print("You can only make a suggestion when you are in a room.")
-            return None
+            result = "You can only make a suggestion when you are in a room."
+            return result
+        
 
         # Set the suggested room to the player's current location
         suggested_room = player.current_space.name
 
         # Find the player object for the suggested character
+        # bug: NPC's are not being listed if less than 6 players
         suggested_character_player = self.find_player_by_character(suggested_character)
-
         # Move the suggested character player to the current player's room
-        if suggested_character_player:
+        if suggested_character_player is not None:
+            old_space = suggested_character_player.current_space
             suggested_character_player.move(player.current_space)
-            print(f"{suggested_character} has been moved to {suggested_room}.")
+            self.removePlayerFromSpace(suggested_character_player, old_space)
+        print(f"{suggested_character} has been moved to {suggested_room}.")
 
         # Players attempt to refute the suggestion
         for other_player in self.players:
             if other_player != player:
                 card_shown = other_player.show_card([suggested_character, suggested_weapon, suggested_room])
                 if card_shown:
-                    print(f"{other_player.character} has shown a card.")
-                    return card_shown
-
-        print("No one could refute the suggestion.")
-        return None
+                    print("This card was shown: " + card_shown.name)
+                    result = other_player.character + " has shown a card: " + card_shown.name
+                    return result
+        result = ("No one could refute the suggestion.")
+        return result
 
     def player_makes_accusation(self, player: Player, character, weapon, room):
         """Handle a player's accusation."""
-        correct = player.make_accusation(character, weapon, room, [card.name for card in self.solution])
+        correct = True
+        accusation = [room, character, weapon]
+        for i in range(3):
+            if accusation[i] != self.solution[i]:
+                correct = False
         if correct:
             self.game_over = True
-            print(f"{player} has won the game!")
+            result =  player.name + " has won the game!"
         else:
-            print(f"{player} has made an incorrect accusation and faces the consequences.")
-        return correct
+             result = player.name + " has made an incorrect accusation and faces the consequences."
+             self.removePlayerfromRotation(player.name)
+
+        return result
     
     def move_player(self, player: Player, new_space_name):
+        return_message = ""
         """Handle a player's request to move to a new space."""
         # Assuming you have a dictionary of spaces and a player object with a current_space attribute.
         if new_space_name in self.gameboard.spaces:
             new_space = self.gameboard.spaces[new_space_name]
+            if (new_space_name == player.current_space.name):
+                return_message = "You are already in " + new_space_name
+                return return_message
+            # validates if destination is a neighbor for the current space
+            isValidNeighbor = self.gameboard.isNeighbor(player.current_space.name,new_space_name)
             if new_space.can_accommodate():
-                # If the player is currently in a space, remove them from that space.
-                if player.current_space:
-                    player.current_space.remove_player(player)
-                # Move player to the new space and add them to the space's list of players.
-                player.move(new_space)
-                new_space.add_player(player)
-                print(f"{player.name} has moved to {new_space.name}.")
-                return True
+                if isValidNeighbor:
+                    # Move player to the new space and add them to the space's list of players.
+                    self.removePlayerFromSpace(player, player.current_space)
+                    player.move(new_space)
+                    new_space.add_player(player)
+                    return_message = player.name + " has moved to " + new_space.name + "."
+                else:
+                    return_message = new_space.name + " is not a valid move from " + player.current_space.name + ". Please choose a valid location to move to."                  
             else:
-                print(f"{new_space.name} cannot accommodate more players.")
+                return_message = new_space.name + " cannot accommodate more players."
         else:
             print("Invalid space name.")
-        return False
+        return return_message
 
     def get_game_status(self):
         """Retrieve the status of the game, including player details."""

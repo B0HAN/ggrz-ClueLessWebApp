@@ -1,0 +1,10 @@
+List of known bugs
+    - Players are not being able to be removed from space objects, this is causing no issues since moving is based
+        on current location in Player objects
+    - NPC, do not have a datafield to keep track of their locations, currently only UI will track this and backend
+        is not keeping any data on their location
+    - Suggestion made in room that is not the current room will result in suspect being moved anyways. UI will display
+        that the subject was moved but the backend will actually moved player to current room
+    - Currentlt returning strings with emit messages but we should change this to data and create the message in app.py 
+    - Need to update UI with locations and cards for each person
+    - game over for all players failing
