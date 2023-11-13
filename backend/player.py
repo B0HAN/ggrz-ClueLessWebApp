@@ -34,8 +34,6 @@ class Player:
     
     def move(self, destination_space: Space):
         """Move the player to a new space."""
-        if self.current_space:
-            self.current_space.remove_player(self)
         destination_space.add_player(self)
         self.current_space = destination_space
 

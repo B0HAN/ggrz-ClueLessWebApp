@@ -134,7 +134,16 @@ class Gameboard:
         self.spaces["Hallway Conservatory-Ballroom"].addNeighbor(self.spaces["Conservatory"])
         self.spaces["Hallway Conservatory-Ballroom"].addNeighbor(self.spaces["Ballroom"])
 
-
+    def get_space(self, destination):
+        return self.spaces[destination]
+    
+    def isNeighbor(self, curr_space, final_space):
+        curr_obj = self.spaces[curr_space]
+        neighbors = [neighbor.name for neighbor in curr_obj.neighbors]
+        if final_space in neighbors:
+            return True
+        else:
+            return False    
 
     def displayGraph(self):
         # Display the graph for testing purposes

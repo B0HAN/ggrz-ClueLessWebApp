@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, jsonify, session
 from flask_socketio import SocketIO, emit
 from game import Game
+from gameboard import Gameboard
+from deck_control import Deck, Card
 
 # Constants
 MAX_PLAYERS_PER_LOBBY = 6
@@ -55,7 +57,6 @@ def create_app():
     @app.route('/get_players', methods=['GET'])
     def get_players():
         return jsonify({"players": players_in_lobby})
-
     
     @app.route('/start_game', methods=['POST'])
     def handle_start_game():
@@ -78,8 +79,11 @@ def create_app():
         curr_game = Game(players_in_lobby)
         #logs
         initial_game_state = curr_game.get_game_status()
+        solution = curr_game.solution
         print("Initial Game State:\n ")
         print(initial_game_state)
+        print("Solution: ")
+        print(solution)
         return jsonify({"status": "Game started for lobby"})
     
     # -----------------
@@ -90,20 +94,83 @@ def create_app():
         username = move_data['username']
         destination = move_data['destination']
         player = curr_game.current_player()
+        #print("Player: " + player.__str__() + "\n Destination: " + destination)
         if(player.__str__() == username):
-            if(curr_game.move_player(player, destination) == True):
-                message = username + "moved to" + destination
-                emit('broadcast_message', message, broadcast=True)
+            message = curr_game.move_player(player, destination)
+            if "is not a valid" in message or 'You are' in message:
+                emit('broadcast_message', message, broadcast=False)
             else:
-                message = destination + " is not avaliable to move."
                 emit('broadcast_message', message, broadcast=True)
         else:
-            emit('broadcast_message', 'IVALID MOVE: It is not your turn.', broadcast=True)
+            emit('broadcast_message', 'IVALID MOVE: It is not your turn.', broadcast=False)
 
     @socketio.on('end_turn')
-    def next_player():
+    def endTurn(user_data):
+        username = user_data['username']
+        player = curr_game.current_player()
+        if(player.__str__() == username):
+            curr_game.next_turn()
+            new_player = curr_game.current_player()
+            message = player.name + " has ended their turn\n It is now " + new_player.name + " turn.\n"
+            emit('broadcast_message', message, broadcast=True)
+        else:
+            emit('broadcast_message', 'IVALID MOVE: It is not your turn.', broadcast=False)
+        game_state = curr_game.get_game_status()
+        print(" ========= CURRENT GAME STATE: \n")
+        print(game_state)
 
-    
+    @socketio.on('make_suggestion')
+    def makeSuggestion(suggestion_data):
+        username = suggestion_data['username']
+        suspect = suggestion_data['suspect']
+        location = suggestion_data['location']
+        weapon = suggestion_data['weapon']
+        player = curr_game.current_player()
+        if(player.__str__() == username):
+            # These events need to happen sepeerately in the future, since after a suggestion is made
+            # players will then choose to show a card through UI
+            message = curr_game.player_makes_suggestion(player, suspect, weapon)
+            fail = "You can only make a suggestion when you are in a room."
+            if message != fail:
+                emit('broadcast_message', suspect + " has been moved to " + location, broadcast=True)
+            #This needs to be a separate event
+            emit('broadcast_message', message, broadcast=False)
+            colon_index = message.find(':')
+            if colon_index != -1:
+                # Remove characters after the colon
+                global_message = message[:colon_index]
+            emit('broadcast_message', global_message, broadcast=True, include_self=False)
+
+        else:
+            emit('broadcast_message', 'IVALID MOVE: It is not your turn.', broadcast=False)
+        game_state = curr_game.get_game_status()
+        print(" ========= CURRENT GAME STATE: \n")
+        print(game_state)
+
+    @socketio.on('make_accusation')
+    def makeAccusation(accusation_data):
+        username = accusation_data['username']
+        suspect = accusation_data['suspect']
+        location = accusation_data['location']
+        weapon = accusation_data['weapon']
+        player = curr_game.current_player()
+        if(player.__str__() == username):
+            # These events need to happen sepeerately in the future, since after a suggestion is made
+            # players will then choose to show a card through UI
+            message = curr_game.player_makes_accusation(player, suspect, weapon, location)
+            emit('broadcast_message', username + " has made an accusation: ", broadcast=True)
+            emit('broadcast_message', suspect +" in the " + location +  " with a " + weapon + "!", broadcast=True)
+            #This needs to be a separate event
+
+            emit('broadcast_message', message, broadcast=True)
+        else:
+            emit('broadcast_message', 'IVALID MOVE: It is not your turn.', broadcast=False)
+        game_state = curr_game.get_game_status()
+        print(" ========= CURRENT GAME STATE: \n")
+        print(game_state)
+        if curr_game.game_over == True:
+            emit('broadcast_message', 'GAME OVER', broadcast=True)
+
 
     @socketio.on('send_message')
     def handle_message(data):

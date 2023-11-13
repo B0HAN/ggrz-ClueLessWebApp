@@ -55,7 +55,10 @@ class Deck:
 
     def get_solution_cards(self):
         """Get the solution cards for display or other purposes."""
-        return self.solution_cards
+        solution_message = []
+        for item in self.solution_cards:
+            solution_message.append(item.name)
+        return solution_message
 
     def add_card(self, card):
         self.cards.append(card)
