@@ -44,6 +44,8 @@ button {
     text-align: center;
     /* line-height: 80px; */
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
   
 .hallway {
@@ -87,10 +89,32 @@ button {
 }
 
 .character-dot {
-    display: inline-block;
+    position: absolute;
+    bottom: 5px;
+    left: 3px;
     width: 10px;
     height: 10px;
-    align-items: flex-end;
     border-radius: 50%;
-    margin-right: 5px;
+    margin-right: 3px;
 }
+
+.character-dot:nth-child(2) {
+    left: 18px;
+  }
+  
+  .character-dot:nth-child(3) {
+    left: 33px;
+  }
+  
+  .character-dot:nth-child(4) {
+    left: 48px;
+  }
+  
+  .character-dot:nth-child(5) {
+    left: 63px;
+  }
+  
+  .character-dot:nth-child(6) {
+    left: 63px;
+    bottom: 21px;
+  }
