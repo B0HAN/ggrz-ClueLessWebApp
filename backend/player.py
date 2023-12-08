@@ -7,6 +7,7 @@ class Player:
         self.hand = []
         self.character = character
         self.current_space = Space("None", "None")
+        self.can_move = True
 
     def receive_card(self, card: Card):
         """Add a card to the player's hand."""
@@ -36,6 +37,9 @@ class Player:
         """Move the player to a new space."""
         destination_space.add_player(self)
         self.current_space = destination_space
+    
+    def set_move(self, state):
+        self.can_move = state
 
     def __str__(self):
         return self.name

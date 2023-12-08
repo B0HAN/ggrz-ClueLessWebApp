@@ -8,6 +8,7 @@ from deck_control import Deck, Card
 MAX_PLAYERS_PER_LOBBY = 6
 MIN_PLAYERS_PER_LOBBY = 3
 
+
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'secret!'
@@ -16,6 +17,8 @@ def create_app():
     # In-memory databases
     users_db = {}  # {username: password}
     players_in_lobby = []
+    global can_move
+    can_move = True
 
 
     # -----------------
@@ -96,11 +99,15 @@ def create_app():
         player = curr_game.current_player()
         #print("Player: " + player.__str__() + "\n Destination: " + destination)
         if(player.__str__() == username):
-            message = curr_game.move_player(player, destination)
-            if "is not a valid" in message or 'You are' in message:
-                emit('broadcast_message', message, broadcast=False)
+            if(player.can_move == True):
+                message = curr_game.move_player(player, destination)
+                if "is not a valid" in message or 'You are' in message:
+                    emit('broadcast_message', message, broadcast=False)
+                else:
+                    emit('broadcast_message', message, broadcast=True)
+                    player.set_move(False)
             else:
-                emit('broadcast_message', message, broadcast=True)
+                emit('broadcast_message', 'You have already moved this turn.', broadcast=False)
         else:
             emit('broadcast_message', 'INVALID MOVE: It is not your turn.', broadcast=False)
 
@@ -113,6 +120,7 @@ def create_app():
             new_player = curr_game.current_player()
             message = player.name + " has ended their turn\n It is now " + new_player.name + " turn.\n"
             emit('broadcast_message', message, broadcast=True)
+            player.set_move(True)
         else:
             emit('broadcast_message', 'INVALID MOVE: It is not your turn.', broadcast=False)
         game_state = curr_game.get_game_status()
