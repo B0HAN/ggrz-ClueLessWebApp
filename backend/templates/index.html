@@ -44,17 +44,54 @@
     <div id="gameSection" style="display: none;">
 
         <h2>Welcome to the Game!</h2>
-        <p>This is your game area. Once the game starts, all the game-related content and interactions will be available here.</p>
     
-        <!-- Sample game content -->
-        <div id="image"></div>
+        <!-- Game content -->
+        <div id="gameBoard">
+            <li>
+                <div class="row">
+                    <div class="cell room" data-coordinates="0,0">Study</div>
+                    <div class="cell hallway" data-coordinates="0,1"></div>
+                    <div class="cell room" data-coordinates="0,2">Hall</div>
+                    <div class="cell hallway" data-coordinates="0,3"></div>
+                    <div class="cell room" data-coordinates="0,4">Lounge</div>
+                </div>
+                <div class="row">
+                    <div class="cell hallway" data-coordinates="1,0"></div>
+                    <div class="cell restricted" data-coordinates="1,1"></div>
+                    <div class="cell hallway" data-coordinates="1,2"></div>
+                    <div class="cell restricted" data-coordinates="1,3"></div>
+                    <div class="cell hallway" data-coordinates="1,4"></div>
+                </div>
+                <div class="row">
+                    <div class="cell room" data-coordinates="2,0">Library</div>
+                    <div class="cell hallway" data-coordinates="2,1"></div>
+                    <div class="cell room" data-coordinates="2,2">Billiard Room</div>
+                    <div class="cell hallway" data-coordinates="2,3"></div>
+                    <div class="cell room" data-coordinates="2,4">Dining Room</div>
+                </div>
+                <div class="row">
+                    <div class="cell hallway" data-coordinates="3,0"></div>
+                    <div class="cell restricted" data-coordinates="3,1"></div>
+                    <div class="cell hallway" data-coordinates="3,2"></div>
+                    <div class="cell restricted" data-coordinates="3,3"></div>
+                    <div class="cell hallway" data-coordinates="3,4"></div>
+                </div>
+                <div class="row">
+                    <div class="cell room" data-coordinates="4,0">Conservatory</div>
+                    <div class="cell hallway" data-coordinates="4,1"></div>
+                    <div class="cell room" data-coordinates="4,2">Ballroom</div>
+                    <div class="cell hallway" data-coordinates="4,3"></div>
+                    <div class="cell room" data-coordinates="4,4">Kitchen</div>
+                </div>
+            </li>
+        </div>
         <div class="game-content" style="display: flex;">
             <div style="flex-grow: 1">
                 <h3>Game Instructions:</h3>
                 <ul>
                     <li>Your turn can consist of:</li>
                     <ul>
-                        <li>    Moving your character and</li>
+                        <li>    Moving your character (to move click on the gameboard) and</li>
                         <li>    Making a suggestion and</li>
                         <li>    Making an accusation</li>
                         <li>    Then end turn</li>
@@ -69,14 +106,16 @@
                 <h3>Current Players Turn:</h3>
                 <!-- <div id="currentPlayersTurn"></div> -->
                 <div style="display: flex">
-                    <div style="flex-grow: 1">
+                    <!-- <div style="flex-grow: 1">
                         <button onclick="movePlayer()">Move</button>
+                    </div> -->
+                    <div style="flex-grow: 1">
+                        <button id="suggestionButton">Make Suggestion</button>
+                        <!-- <button id=onclick="suggestionMessage()">Make Suggestion</button> -->
                     </div>
                     <div style="flex-grow: 1">
-                        <button onclick="suggestionMessage()">Make Suggestion</button>
-                    </div>
-                    <div style="flex-grow: 1">
-                        <button onclick="accusationMessage()">Make Accusation</button>
+                        <button id="accusationButton">Make Accusation</button>
+                        <!-- <button onclick="accusationMessage()">Make Accusation</button> -->
                     </div>
                     <div style="flex-grow: 1">
                         <button onclick="endTurnMessage()">End Turn</button>
@@ -84,8 +123,6 @@
                 </div>
             </div>
         </div>
-        
-        <!-- You can add buttons, game canvas, scoreboards, etc. here -->
         
 
         <div class="playerUtils" style="display: flex;">
@@ -103,7 +140,7 @@
             </div>
         </div>
 
-        <h3>Choose where to move:</h3>
+        <!-- <h3>Choose where to move:</h3>
         <div class="makeAMove">
             <label for="moveToPlace">Choose a place to move to:</label>
             <select name="moveToPlace" id="moveToPlace">
@@ -133,11 +170,11 @@
                     <option value="Hallway Ballroom-Kitchen">Hallway Ballroom-Kitchen</option>
                 </optgroup>
             </select>
-        
-        <h3>Make a suggestion/accusation:</h3>
-        <div class="personPlaceThing">
+        </div> -->
+        <div id="suggestionMenu" class="hidden">
+            <h3>Make a suggestion:</h3>
             <label for="suspect">Choose a suspect:</label>
-            <select name="suspect" id="suspect">
+            <select name="suspect" id="suggestSuspect">
                 <option value="Miss Scarlet">Miss Scarlet</option>
                 <option value="Colonel Mustard">Colonel Mustard</option>
                 <option value="Mrs. White">Mrs. White</option>
@@ -145,9 +182,8 @@
                 <option value="Mrs. Peacock">Mrs. Peacock</option>
                 <option value="Professor Plum">Professor Plum</option>
             </select>
-            <!-- This is temporary until we get backend more giving me this info -->
             <label for="weapon">Choose a weapon:</label>
-            <select name="weapon" id="weapon">
+            <select name="weapon" id="suggestWeapon">
                 <option value="Rope">Rope</option>
                 <option value="Lead Pipe">Lead Pipe</option>
                 <option value="Knife">Knife</option>
@@ -155,6 +191,42 @@
                 <option value="Candlestick">Candlestick</option>
                 <option value="Revolver">Revolver</option>
             </select>
+            <button id="submitSuggestionButton">Submit Suggestion</button>
+        </div>
+
+        <div id="accusationMenu" class="hidden">
+            <h3>Make an accusation:</h3>
+            <label for="suspect">Choose a suspect:</label>
+            <select name="suspect" id="accuseSuspect">
+                <option value="Miss Scarlet">Miss Scarlet</option>
+                <option value="Colonel Mustard">Colonel Mustard</option>
+                <option value="Mrs. White">Mrs. White</option>
+                <option value="Mr. Green">Mr. Green</option>
+                <option value="Mrs. Peacock">Mrs. Peacock</option>
+                <option value="Professor Plum">Professor Plum</option>
+            </select>
+            <label for="place">Choose a place:</label>
+            <select name="place" id="accuseLocation">
+                <option value="Study">Study</option>
+                <option value="Kitchen">Kitchen</option>
+                <option value="Hall">Hall</option>
+                <option value="Lounge">Lounge</option>
+                <option value="Library">Library</option>
+                <option value="Billiard Room">Billiard Room</option>
+                <option value="Dining Room">Dining Room</option>
+                <option value="Conservatory">Conservatory</option>
+                <option value="Ballroom">Ballroom</option>
+            </select>
+            <label for="weapon">Choose a weapon:</label>
+            <select name="weapon" id="accuseWeapon">
+                <option value="Rope">Rope</option>
+                <option value="Lead Pipe">Lead Pipe</option>
+                <option value="Knife">Knife</option>
+                <option value="Wrench">Wrench</option>
+                <option value="Candlestick">Candlestick</option>
+                <option value="Revolver">Revolver</option>
+            </select>
+            <button id="submitAccusationButton">Submit Accusation</button>
         </div>
 
     </div>

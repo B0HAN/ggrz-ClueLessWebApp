@@ -102,7 +102,7 @@ def create_app():
             else:
                 emit('broadcast_message', message, broadcast=True)
         else:
-            emit('broadcast_message', 'INVALID MOVE: It is not your turn.', broadcast=False)
+            emit('broadcast_message', 'IVALID MOVE: It is not your turn.', broadcast=False)
 
     @socketio.on('end_turn')
     def endTurn(user_data):
@@ -114,7 +114,7 @@ def create_app():
             message = player.name + " has ended their turn\n It is now " + new_player.name + " turn.\n"
             emit('broadcast_message', message, broadcast=True)
         else:
-            emit('broadcast_message', 'INVALID MOVE: It is not your turn.', broadcast=False)
+            emit('broadcast_message', 'IVALID MOVE: It is not your turn.', broadcast=False)
         game_state = curr_game.get_game_status()
         print(" ========= CURRENT GAME STATE: \n")
         print(game_state)
@@ -125,14 +125,14 @@ def create_app():
         suspect = suggestion_data['suspect']
         weapon = suggestion_data['weapon']
         player = curr_game.current_player()
-        curr_location = player.current_space.name
+        location = player.current_space.name
         if(player.__str__() == username):
             # These events need to happen sepeerately in the future, since after a suggestion is made
             # players will then choose to show a card through UI
             message = curr_game.player_makes_suggestion(player, suspect, weapon)
             fail = "You can only make a suggestion when you are in a room."
             if message != fail:
-                emit('broadcast_message', suspect + " has been moved to " + curr_location, broadcast=True)
+                emit('broadcast_message', suspect + " has been moved to " + location, broadcast=True)
             #This needs to be a separate event
             emit('broadcast_message', message, broadcast=False)
             colon_index = message.find(':')

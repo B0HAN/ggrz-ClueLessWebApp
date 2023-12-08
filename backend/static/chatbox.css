@@ -9,6 +9,8 @@
     border: 1px solid #ccc;
     overflow-y: auto; /* add a vertical scrollbar if messages overflow */
     margin-bottom: 10px;
+    flex-direction: column-reverse;
+    display: flex;
 }
 
 #messageInput {
@@ -21,3 +23,46 @@ button {
     padding: 10px 20px;
 }
 
+#gameBoard {
+    display: flex;
+    flex-wrap: wrap;
+    width: 400px;
+    margin: 20px auto;
+    font-size: 15px;
+    list-style-type: none;
+}
+  
+.row {
+    display: flex;
+    justify-content: center;
+}
+  
+.cell {
+    flex: 0 0 80px;
+    height: 80px;
+    border: 1px solid black;
+    text-align: center;
+    /* line-height: 80px; */
+    cursor: pointer;
+}
+  
+.hallway {
+    background-color: lightgray;
+}
+  
+.room {
+    background-color: lightblue;
+}
+  
+.restricted {
+    background-color: rgba(39, 39, 39, 0.897);
+}
+
+.hidden {
+  display: none;
+}
+  
+.player {
+    background-color: blue;
+    color: white;
+}

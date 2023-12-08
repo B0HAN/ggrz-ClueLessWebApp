@@ -131,12 +131,11 @@ function startGame() {
             alert(data.error);
         } else {
             alert("Game started!");
-            img.onload();
         }
     })
     .catch((error) => {
         console.error('Error:', error);
-        alert("An error occurred while trying to start the game.");
+        alert(error);
     });
 }
 
@@ -170,29 +169,84 @@ function getPlayerInGame(playersData) {
     }
 }
 
+// Get all cells on the game board
+const cells = document.querySelectorAll('.cell').forEach(cell => {
+    cell.addEventListener('click', function() {
+        const coordinates = cell.getAttribute('data-coordinates').split(',');
+        const row = parseInt(coordinates[0]);
+        const col = parseInt(coordinates[1]);
 
-// loads the image
-var img = new Image(); 
-var div = document.getElementById("image"); 
+        // Eventually add ability to check for available moves
+        if (!cell.classList.contains('restricted')) {
+            var location;
+            if (isRoom(row, col)) {
+                location = getRoomName(row, col);
+            }
+            else {
+                location = getHallwayName(row, col);
+            }
+            socket.emit('move_player', { username: currentUsername, destination: location });
+        }
+  });
+});
 
-img.onload = function() { 
-    div.appendChild(img);
-}; 
-   
-img.src = staticBasePath + 'gameboard.png'; 
-
-function selectionMessage(inputMessage) {
-    var message = currentUsername + inputMessage;
-    if (message.trim() !== '') {
-        socket.emit('send_message', { username: "System", message: message });
-        document.getElementById('messageInput').value = ''; // Clear input after sending
-    }
+function getRoomName(row, col) {
+    const roomNames = [
+      'Study', 'Hall', 'Lounge',
+      'Library', 'Billiard Room', 'Dining Room',
+      'Conservatory', 'Ballroom', 'Kitchen'
+    ];
+    const index = (row / 2) * 3 + col / 2;
+    return roomNames[index];
 }
 
-function movePlayer() {
-    var location = document.getElementById('moveToPlace').value;
-    socket.emit('move_player', { username: currentUsername, destination: location });
+function getHallwayName(row, col) {
+    const hallwayNames = [
+      'Hallway Study-Hall', 'Hallway Hall-Lounge', 'Hallway Study-Library', 'Hallway Hall-Billiard Room', 'Hallway Lounge-Dining Room',
+      'Hallway Library-Billiard Room', 'Hallway Billiard Room-Dining Room', 'Hallway Library-Conservatory', 'Hallway Billiard Room-Ballroom', 'Hallway Dining Room-Kitchen',
+      'Hallway Conservatory-Ballroom', 'Hallway Ballroom-Kitchen'
+    ];
+    const index = (row * 5 + col - 1) / 2;
+    return hallwayNames[index];
+  }
+
+function isRoom(row, col) {
+    const roomPositions = [
+      [0, 0], [0, 2], [0, 4],
+      [2, 0], [2, 2], [2, 4],
+      [4, 0], [4, 2], [4, 4]
+    ];
+    return roomPositions.some(coords => coords[0] === row && coords[1] === col);
 }
+
+const suggestionButton = document.getElementById('suggestionButton');
+const suggestionMenu = document.getElementById('suggestionMenu');
+
+suggestionButton.addEventListener('click', function() {
+    suggestionMenu.classList.toggle('hidden');
+});
+
+submitSuggestionButton.addEventListener('click', function() {
+    suggestionMessage();
+    suggestionMenu.classList.toggle('hidden');
+});
+
+const accusationButton = document.getElementById('accusationButton');
+const accusationMenu = document.getElementById('accusationMenu');
+
+accusationButton.addEventListener('click', function() {
+    accusationMenu.classList.toggle('hidden');
+});
+
+submitAccusationButton.addEventListener('click', function() {
+    accusationMessage();
+    accusationMenu.classList.toggle('hidden');
+});
+
+// function movePlayer() {
+//     var location = document.getElementById('moveToPlace').value;
+//     socket.emit('move_player', { username: currentUsername, destination: location });
+// }
 
 function suggestionMessage() {
     var player = document.getElementById('suggestSuspect').value;
@@ -201,10 +255,10 @@ function suggestionMessage() {
 }
 
 function accusationMessage() {
-    var player = document.getElementById('suspect').value;
-    var place = document.getElementById('place').value;
-    var item = document.getElementById('weapon').value;
-    socket.emit('make_accusation', { username: currentUsername, suspect: player, location: place, weapon: item });
+    var player = document.getElementById('accuseSuspect').value;
+    var place = document.getElementById('accuseLocation').value;
+    var weapon = document.getElementById('accuseWeapon').value;
+    socket.emit('make_accusation', { username: currentUsername, suspect: player, location: place, weapon: weapon });
 }
 
 function endTurnMessage() {
