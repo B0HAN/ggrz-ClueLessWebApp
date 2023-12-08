@@ -62,7 +62,35 @@ button {
   display: none;
 }
   
-.player {
+.plum {
+    background-color: purple;
+}
+
+.green {
+    background-color: green;
+}
+
+.scarlet {
+    background-color: red;
+}
+
+.white {
+    background-color: white;
+}
+
+.peacock {
     background-color: blue;
-    color: white;
+}
+
+.mustard {
+    background-color: yellow;
+}
+
+.character-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    align-items: flex-end;
+    border-radius: 50%;
+    margin-right: 5px;
 }
