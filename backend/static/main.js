@@ -195,10 +195,9 @@ function movePlayer() {
 }
 
 function suggestionMessage() {
-    var player = document.getElementById('suspect').value;
-    var place = document.getElementById('place').value;
-    var item = document.getElementById('weapon').value;
-    socket.emit('make_suggestion', { username: currentUsername, suspect: player, location: place, weapon: item });
+    var player = document.getElementById('suggestSuspect').value;
+    var weapon = document.getElementById('suggestWeapon').value;
+    socket.emit('make_suggestion', { username: currentUsername, suspect: player, weapon: weapon });
 }
 
 function accusationMessage() {

@@ -123,16 +123,16 @@ def create_app():
     def makeSuggestion(suggestion_data):
         username = suggestion_data['username']
         suspect = suggestion_data['suspect']
-        location = suggestion_data['location']
         weapon = suggestion_data['weapon']
         player = curr_game.current_player()
+        curr_location = player.current_space.name
         if(player.__str__() == username):
             # These events need to happen sepeerately in the future, since after a suggestion is made
             # players will then choose to show a card through UI
             message = curr_game.player_makes_suggestion(player, suspect, weapon)
             fail = "You can only make a suggestion when you are in a room."
             if message != fail:
-                emit('broadcast_message', suspect + " has been moved to " + location, broadcast=True)
+                emit('broadcast_message', suspect + " has been moved to " + curr_location, broadcast=True)
             #This needs to be a separate event
             emit('broadcast_message', message, broadcast=False)
             colon_index = message.find(':')
