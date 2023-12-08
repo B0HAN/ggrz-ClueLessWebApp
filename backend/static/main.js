@@ -169,13 +169,40 @@ function getPlayerInGame(playersData) {
     }
 }
 
+const characterData = {
+    scarlet: { room: [0, 0], color: 'red' },
+    peacock: { room: [0, 2], color: 'blue' },
+    green: { room: [2, 2], color: 'green' },
+    mustard: { room: [4, 4], color: 'yellow' },
+    plum: { room: [4, 4], color: 'purple' },
+    white: { room: [4, 4], color: 'white' }
+}
+
 // Get all cells on the game board
 const cells = document.querySelectorAll('.cell').forEach(cell => {
-    cell.addEventListener('click', function() {
-        const coordinates = cell.getAttribute('data-coordinates').split(',');
-        const row = parseInt(coordinates[0]);
-        const col = parseInt(coordinates[1]);
+    const coordinates = cell.getAttribute('data-coordinates').split(',');
+    const row = parseInt(coordinates[0]);
+    const col = parseInt(coordinates[1]);
 
+    // Check if the current cell matches any character's position
+    Object.keys(characterData).forEach(character => {
+        const characterPosition = characterData[character];
+        const [cRow, cCol] = characterPosition.room;
+        // Find the cell with matching coordinates
+        const cell = document.querySelector(`.cell[data-coordinates="${cRow},${cCol}"]`);
+
+        if (cell && !cell.querySelector(`.character-dot.${character}`)) {
+            // Create a character dot element
+            const characterDot = document.createElement('div');
+            characterDot.classList.add('character-dot', character);
+            characterDot.style.backgroundColor = characterPosition.color;
+        
+            // Append the character dot to the cell
+            cell.appendChild(characterDot);
+          }
+    });
+
+    cell.addEventListener('click', function() {
         // Eventually add ability to check for available moves
         if (!cell.classList.contains('restricted')) {
             var location;

@@ -44,6 +44,8 @@ button {
     text-align: center;
     /* line-height: 80px; */
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
   
 .hallway {
@@ -62,7 +64,57 @@ button {
   display: none;
 }
   
-.player {
-    background-color: blue;
-    color: white;
+.plum {
+    background-color: purple;
 }
+
+.green {
+    background-color: green;
+}
+
+.scarlet {
+    background-color: red;
+}
+
+.white {
+    background-color: white;
+}
+
+.peacock {
+    background-color: blue;
+}
+
+.mustard {
+    background-color: yellow;
+}
+
+.character-dot {
+    position: absolute;
+    bottom: 5px;
+    left: 3px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 3px;
+}
+
+.character-dot:nth-child(2) {
+    left: 18px;
+  }
+  
+  .character-dot:nth-child(3) {
+    left: 33px;
+  }
+  
+  .character-dot:nth-child(4) {
+    left: 48px;
+  }
+  
+  .character-dot:nth-child(5) {
+    left: 63px;
+  }
+  
+  .character-dot:nth-child(6) {
+    left: 63px;
+    bottom: 21px;
+  }
