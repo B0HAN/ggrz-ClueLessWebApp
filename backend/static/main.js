@@ -250,8 +250,9 @@ submitAccusationButton.addEventListener('click', function() {
 
 function suggestionMessage() {
     var player = document.getElementById('suggestSuspect').value;
+    var place = document.getElementById('suggestPlace').value;
     var weapon = document.getElementById('suggestWeapon').value;
-    socket.emit('make_suggestion', { username: currentUsername, suspect: player, weapon: weapon });
+    socket.emit('make_suggestion', { username: currentUsername, suspect: player, location: place, weapon: weapon });
 }
 
 function accusationMessage() {

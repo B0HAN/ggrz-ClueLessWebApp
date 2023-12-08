@@ -102,7 +102,7 @@ def create_app():
             else:
                 emit('broadcast_message', message, broadcast=True)
         else:
-            emit('broadcast_message', 'IVALID MOVE: It is not your turn.', broadcast=False)
+            emit('broadcast_message', 'INVALID MOVE: It is not your turn.', broadcast=False)
 
     @socketio.on('end_turn')
     def endTurn(user_data):
@@ -114,7 +114,7 @@ def create_app():
             message = player.name + " has ended their turn\n It is now " + new_player.name + " turn.\n"
             emit('broadcast_message', message, broadcast=True)
         else:
-            emit('broadcast_message', 'IVALID MOVE: It is not your turn.', broadcast=False)
+            emit('broadcast_message', 'INVALID MOVE: It is not your turn.', broadcast=False)
         game_state = curr_game.get_game_status()
         print(" ========= CURRENT GAME STATE: \n")
         print(game_state)
@@ -123,9 +123,9 @@ def create_app():
     def makeSuggestion(suggestion_data):
         username = suggestion_data['username']
         suspect = suggestion_data['suspect']
+        location = suggestion_data['location']
         weapon = suggestion_data['weapon']
         player = curr_game.current_player()
-        location = player.current_space.name
         if(player.__str__() == username):
             # These events need to happen sepeerately in the future, since after a suggestion is made
             # players will then choose to show a card through UI
