@@ -243,11 +243,6 @@ submitAccusationButton.addEventListener('click', function() {
     accusationMenu.classList.toggle('hidden');
 });
 
-// function movePlayer() {
-//     var location = document.getElementById('moveToPlace').value;
-//     socket.emit('move_player', { username: currentUsername, destination: location });
-// }
-
 function suggestionMessage() {
     var player = document.getElementById('suggestSuspect').value;
     var weapon = document.getElementById('suggestWeapon').value;
@@ -264,3 +259,25 @@ function accusationMessage() {
 function endTurnMessage() {
     socket.emit('end_turn', { username: currentUsername});
 }
+
+// Sample list data
+const listCards = ['Card 1', 'Card 2', 'Card 3'];
+
+// Get the container element
+const listCardsContainer = document.getElementById('listCardsContainer');
+
+// Generate the list and populate it in the container
+listCards.forEach(card => {
+  const li = document.createElement('li');
+  li.textContent = card;
+
+  // Add click event listener to each list item
+  li.addEventListener('click', () => {
+    // Handle the click event
+    // console.log(`Clicked: ${card}`);
+    var message = 'Clicked on ' + card;
+    socket.emit('send_message', { username: currentUsername, message: message });
+  });
+
+  listCardsContainer.appendChild(li);
+});
