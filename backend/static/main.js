@@ -302,9 +302,6 @@ function endTurnMessage() {
 // Sample list data
  listCards = [];
 
-// Get the container element
-// const listCardsContainer = document.getElementById('listCardsContainer');
-
 function updateList(currUser) {
     fetch('/update_list', {
         method: 'POST',
@@ -340,3 +337,34 @@ function updateList(currUser) {
     .catch(error => console.error('Error:', error));
 }
 
+
+// Notes section
+// Get the lists of suspects, weapons, and rooms
+const suspectsList = document.getElementById('suspects-list');
+const weaponsList = document.getElementById('weapons-list');
+const roomsList = document.getElementById('rooms-list');
+
+// Add event listeners to the checkboxes
+suspectsList.addEventListener('change', handleCheckboxChange);
+weaponsList.addEventListener('change', handleCheckboxChange);
+roomsList.addEventListener('change', handleCheckboxChange);
+
+// Function to handle checkbox change
+function handleCheckboxChange(event) {
+    const checkbox = event.target;
+    const isChecked = checkbox.checked;
+    const label = checkbox.nextElementSibling;
+
+    if (isChecked) {
+        label.style.textDecoration = 'line-through';
+    } else {
+        label.style.textDecoration = 'none';
+    }
+}
+
+const toggleNotes = document.getElementById('toggleNotes');
+const notesSection = document.getElementById('notes');
+
+toggleNotes.addEventListener('click', function() {
+    notesSection.classList.toggle('hidden');
+});

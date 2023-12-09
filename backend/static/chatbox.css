@@ -100,21 +100,57 @@ button {
 
 .character-dot:nth-child(2) {
     left: 18px;
-  }
+}
   
-  .character-dot:nth-child(3) {
+.character-dot:nth-child(3) {
     left: 33px;
-  }
+}
   
-  .character-dot:nth-child(4) {
+.character-dot:nth-child(4) {
     left: 48px;
-  }
+}
   
-  .character-dot:nth-child(5) {
+.character-dot:nth-child(5) {
     left: 63px;
-  }
+}
   
-  .character-dot:nth-child(6) {
+.character-dot:nth-child(6) {
     left: 63px;
     bottom: 21px;
-  }
+}
+
+/* Notes Display options */
+#notes {
+    width: 80%; /* adjust as needed */
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+  
+#notes ul {
+    column-count: 2;
+    column-gap: 10px;
+}
+  
+#notes li {
+    margin-bottom: 10px;
+}
+  
+label {
+    margin-left: 5px;
+}
+  
+input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+.notes-header {
+    display: flex;
+    align-items: center;
+}
+  
+.notes-header h3 {
+    margin-right: 10px;
+}

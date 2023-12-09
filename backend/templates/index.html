@@ -132,10 +132,6 @@
             </div>
 
             <div style="flex-grow: 1">
-                <h3></h3>
-            </div>
-
-            <div style="flex-grow: 1">
                 <h3>Your Cards:</h3>
                 <ul id="listCardsContainer"></ul>
                 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -178,6 +174,46 @@
                     });
                 </script>
             </div>
+
+            <div style="flex-grow: .7">
+                <div class="notes-header">
+                    <h3>Note Sheet:</h3>
+                    <button id="toggleNotes">Toggle Notes</button>
+                </div>
+                <div id="notes" class="hidden">
+                    <h4>Suspects</h4>
+                    <ul id="suspects-list">
+                        <li><input type="checkbox" id="suspect1"><label for="suspect1">Miss Scarlet</label></li>
+                        <li><input type="checkbox" id="suspect2"><label for="suspect2">Colonel Mustard</label></li>
+                        <li><input type="checkbox" id="suspect3"><label for="suspect3">Mrs. White</label></li>
+                        <li><input type="checkbox" id="suspect4"><label for="suspect4">Mr. Green</label></li>
+                        <li><input type="checkbox" id="suspect5"><label for="suspect5">Mrs. Peacock</label></li>
+                        <li><input type="checkbox" id="suspect6"><label for="suspect6">Professor Plum</label></li>
+                    </ul>
+                    <h4>Weapons</h4>
+                    <ul id="weapons-list">
+                        <li><input type="checkbox" id="weapon1"><label for="weapon1">Candlestick</label></li>
+                        <li><input type="checkbox" id="weapon2"><label for="weapon2">Lead Pipe</label></li>
+                        <li><input type="checkbox" id="weapon3"><label for="weapon3">Revolver</label></li>
+                        <li><input type="checkbox" id="weapon4"><label for="weapon4">Rope</label></li>
+                        <li><input type="checkbox" id="weapon5"><label for="weapon5">Knife</label></li>
+                        <li><input type="checkbox" id="weapon6"><label for="weapon6">Wrench</label></li>
+                    </ul>
+                    <h4>Rooms</h4>
+                    <ul id="rooms-list">
+                        <li><input type="checkbox" id="room1"><label for="room1">Study</label></li>
+                        <li><input type="checkbox" id="room2"><label for="room2">Hall</label></li>
+                        <li><input type="checkbox" id="room3"><label for="room3">Lounge</label></li>
+                        <li><input type="checkbox" id="room4"><label for="room4">Library</label></li>
+                        <li><input type="checkbox" id="room5"><label for="room5">Billiard Room</label></li>
+                        <li><input type="checkbox" id="room6"><label for="room6">Dining Room</label></li>
+                        <li><input type="checkbox" id="room7"><label for="room7">Conservatory</label></li>
+                        <li><input type="checkbox" id="room8"><label for="room8">Ballroom</label></li>
+                        <li><input type="checkbox" id="room9"><label for="room9">Kitchen</label></li>
+                    </ul>
+                </div>
+            </div>
+            
         </div>
 
         <div id="suggestionMenu" class="hidden">
