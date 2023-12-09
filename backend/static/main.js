@@ -25,6 +25,7 @@ socket.on('players_update', function(updatedPlayers) {
 
 socket.on('game_started', function() {
     document.getElementById('lobbySection').style.display = 'none';
+    document.getElementById('chatSection').style.display = 'none';
     document.getElementById('gameSection').style.display = 'block';
     fetchPlayersInGame();
     updateList(currentUsername);
