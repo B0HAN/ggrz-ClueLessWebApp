@@ -19,6 +19,10 @@ def create_app():
     players_in_lobby = []
     global can_move
     can_move = True
+    global player_suggesting
+    global current_suggestion 
+    player_suggesting = ""
+    current_suggestion = []
 
 
     # -----------------
@@ -137,23 +141,69 @@ def create_app():
         if(player.__str__() == username):
             # These events need to happen sepeerately in the future, since after a suggestion is made
             # players will then choose to show a card through UI
-            message = curr_game.player_makes_suggestion(player, suspect, weapon)
-            fail = "You can only make a suggestion when you are in a room."
-            if message != fail:
-                emit('broadcast_message', suspect + " has been moved to " + location, broadcast=True)
-            #This needs to be a separate event
-            emit('broadcast_message', message, broadcast=False)
-            colon_index = message.find(':')
-            if colon_index != -1:
+            message = curr_game.player_makes_suggestion(player, suspect)
+            if(message != "You can only make a suggestion when you are in a room."):
+                emit('broadcast_message', username + " has made an suggestion: ", broadcast=True)
+                emit('broadcast_message', suspect +" in the " + location +  " with a " + weapon + ".", broadcast=True)
+                emit('broadcast_message', message, broadcast=True)
+                result_message = "No one could refute this claim!"
+                for next_player in players_in_lobby:
+                    has_card = curr_game.find_refute(player,next_player,suspect,weapon,location)
+                    if(has_card):
+                        result_message = next_player + " is picking a card."
+                        global player_suggesting
+                        player_suggesting = next_player
+                        global current_suggestion
+                        current_suggestion = [suspect,weapon,location]
+                        print("Refuting Player is:  " + player_suggesting)
+                        break
+                
+                emit('broadcast_message', result_message, broadcast=True)
+            else:
+                emit('broadcast_message', message, broadcast=False)
+
+             #This message broadcasts the card that is shown
+            #emit('broadcast_message', message, broadcast=False)
+            #colon_index = message.find(':')
+            #if colon_index != -1:
                 # Remove characters after the colon
-                global_message = message[:colon_index]
-            emit('broadcast_message', global_message, broadcast=True, include_self=False)
+                #global_message = message[:colon_index]
+            #emit('broadcast_message', global_message, broadcast=True, include_self=False)
 
         else:
             emit('broadcast_message', 'IVALID MOVE: It is not your turn.', broadcast=False)
         game_state = curr_game.get_game_status()
         print(" ========= CURRENT GAME STATE: \n")
         print(game_state)
+
+    @socketio.on('pick_card')
+    def playerPicksCard(pick_data):
+        username = pick_data['username']
+        cardChosen = pick_data['cardChosen']
+        player = curr_game.current_player()
+        global player_suggesting
+        global  current_suggestion
+        if(username == player_suggesting):
+            if(cardChosen in current_suggestion):
+                data = []
+                to_suggester = "The card is: " + cardChosen
+                data.append(player.name)
+                data.append(to_suggester)
+                global_message = username + " has shown a card."
+                private_message = "You have shown a card:" + cardChosen
+                emit('broadcast_message', private_message, broadcast=False)
+                emit('broadcast_message', global_message, broadcast=True, include_self=False)
+                emit('private_to_user', data, broadcast=True)
+                player_suggesting = ""
+                current_suggestion = []
+            else:
+                if(current_suggestion != []):
+                    wrong_card = "Please pick a card that in the current suggestion: \n" + current_suggestion[0] +" in the " + current_suggestion[2] +  " with a " + current_suggestion[1] + "!" 
+                    emit('broadcast_message', wrong_card, broadcast=False)
+        else:
+            end_message = "Please wait for " + player_suggesting + " to pick a card."
+            if(player_suggesting != ""):
+                emit('broadcast_message', end_message, broadcast=False)
 
     @socketio.on('make_accusation')
     def makeAccusation(accusation_data):
@@ -178,7 +228,20 @@ def create_app():
         print(game_state)
         if curr_game.game_over == True:
             emit('broadcast_message', 'GAME OVER', broadcast=True)
-
+    
+    @app.route('/update_list', methods=['POST'])
+    def update_list():
+        data = request.data.decode('utf-8')
+        players = curr_game.players
+        for player in players:
+            if(player.name == data):
+                list_cards = player.get_cards()
+        return jsonify({"data": list_cards})
+        
+    @socketio.on('send_message_priv')
+    def handle_message(data):
+        message = data['message']
+        emit('broadcast_message', message, broadcast=False)
 
     @socketio.on('send_message')
     def handle_message(data):

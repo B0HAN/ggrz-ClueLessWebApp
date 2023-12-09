@@ -6,6 +6,17 @@ socket.on('broadcast_message', function(data) {
     document.getElementById('messagesBox').innerHTML += '<br>' + data;
 });
 
+socket.on('private_to_user', function(data) {
+    let username = data[0];
+    let message = data[1];
+    if (currentUsername === username) {
+        document.getElementById('messagesBox').innerHTML += '<br>' + message;
+    }
+});
+
+
+
+
 // Socket event listener for player list updates
 socket.on('players_update', function(updatedPlayers) {
     console.log("Received players_update event", updatedPlayers);
@@ -16,6 +27,7 @@ socket.on('game_started', function() {
     document.getElementById('lobbySection').style.display = 'none';
     document.getElementById('gameSection').style.display = 'block';
     fetchPlayersInGame();
+    updateList(currentUsername);
 });
 
 // Message Sending Function
@@ -288,23 +300,43 @@ function endTurnMessage() {
 }
 
 // Sample list data
-const listCards = ['Card 1', 'Card 2', 'Card 3'];
+ listCards = [];
 
 // Get the container element
-const listCardsContainer = document.getElementById('listCardsContainer');
+// const listCardsContainer = document.getElementById('listCardsContainer');
 
-// Generate the list and populate it in the container
-listCards.forEach(card => {
-  const li = document.createElement('li');
-  li.textContent = card;
+function updateList(currUser) {
+    fetch('/update_list', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: currUser
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Received data:', data.data);
+        
+            // Update the frontend list display
+            listCards = data.data;
 
-  // Add click event listener to each list item
-  li.addEventListener('click', () => {
-    // Handle the click event
-    // console.log(`Clicked: ${card}`);
-    var message = 'Clicked on ' + card;
-    socket.emit('send_message', { username: currentUsername, message: message });
-  });
+            // Clear the existing list items
+            const listCardsContainer = document.getElementById('listCardsContainer');
+            listCardsContainer.innerHTML = '';
 
-  listCardsContainer.appendChild(li);
-});
+            // Generate the list and populate it in the container
+            listCards.forEach(card => {
+                const li = document.createElement('li');
+                li.textContent = card;
+  
+                // Add click event listener to each list item
+                li.addEventListener('click', () => {
+                    socket.emit('pick_card', { username: currentUsername, cardChosen: card });
+                });
+  
+                listCardsContainer.appendChild(li);
+            });
+    })
+    .catch(error => console.error('Error:', error));
+}
+

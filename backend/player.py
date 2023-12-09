@@ -26,12 +26,6 @@ class Player:
         """Make a suggestion to gather information."""
         return character, weapon, room
 
-    def show_card(self, suggestion):
-        """Reveal a card from the hand to disprove a suggestion."""
-        for card in self.hand:
-            if card.name in suggestion:
-                return card
-        return None
     
     def move(self, destination_space: Space):
         """Move the player to a new space."""
@@ -40,6 +34,22 @@ class Player:
     
     def set_move(self, state):
         self.can_move = state
+
+    def get_cards(self):
+        list_cards = self.hand
+        final_list = []
+        for card in list_cards:
+            name = card.get_name()
+            final_list.append(name)
+        return final_list
+    
+    def get_valid_card(self, suggestion):
+        cards = []
+        """Reveal a card from the hand to disprove a suggestion."""
+        for card in self.hand:
+            if card.name in suggestion:
+                cards.append(card)
+        return cards
 
     def __str__(self):
         return self.name

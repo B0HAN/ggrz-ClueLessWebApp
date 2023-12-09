@@ -138,6 +138,45 @@
             <div style="flex-grow: 1">
                 <h3>Your Cards:</h3>
                 <ul id="listCardsContainer"></ul>
+                <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    
+                <script>
+                    // Function to update the list using AJAX
+                    function updateList() {
+                        fetch('/update_list')
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Received data:', data.data);
+                            
+                                // Update the frontend list display
+                                listCards = data.data;
+
+                                // Clear the existing list items
+                                const listCardsContainer = document.getElementById('listCardsContainer');
+                                listCardsContainer.innerHTML = '';
+
+                                // Generate the list and populate it in the container
+                                listCards.forEach(card => {
+                                    const li = document.createElement('li');
+                                    li.textContent = card;
+                    
+                                    // Add click event listener to each list item
+                                    li.addEventListener('click', () => {
+                                        var message = 'Clicked on ' + card;
+                                        socket.emit('send_message', { username: currentUsername, message: message });
+                                    });
+                    
+                                    listCardsContainer.appendChild(li);
+                                });
+                        })
+                        .catch(error => console.error('Error:', error));
+                    }
+            
+                    // Call the updateList function on page load or in response to some event
+                    $(document).ready(function() {
+                        updateList();
+                    });
+                </script>
             </div>
         </div>
 

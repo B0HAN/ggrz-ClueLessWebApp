@@ -57,7 +57,9 @@ class Game:
     def current_player(self):
         # Return the current player
         return self.players[self.current_player_index]
-
+    
+    def get_player_at(self, index):
+        return self.players[index]
 
     def distribute_cards(self):
         """Distribute cards to players."""
@@ -86,17 +88,18 @@ class Game:
                 print(curr_player.name + "was removed. New number of player is: " + str(player_count))
                 break
 
-    def player_makes_suggestion(self, player: Player, suggested_character, suggested_weapon):
+    def player_makes_suggestion(self, player: Player, suggested_character):
         result = ""
         """Handle a player's suggestion, ensuring the player is in a room."""
         # Check if the player is in a room
         if player.current_space.space_type != "Room":
             result = "You can only make a suggestion when you are in a room."
             return result
-        
-
         # Set the suggested room to the player's current location
         suggested_room = player.current_space.name
+        if "Hallway" in suggested_room:
+            result = "You can only make a suggestion when you are in a room."
+            return result
 
         # Find the player object for the suggested character
         # bug: NPC's are not being listed if less than 6 players
@@ -106,18 +109,22 @@ class Game:
             old_space = suggested_character_player.current_space
             suggested_character_player.move(player.current_space)
             self.removePlayerFromSpace(suggested_character_player, old_space)
-        print(f"{suggested_character} has been moved to {suggested_room}.")
-
-        # Players attempt to refute the suggestion
-        for other_player in self.players:
-            if other_player != player:
-                card_shown = other_player.show_card([suggested_character, suggested_weapon, suggested_room])
-                if card_shown:
-                    print("This card was shown: " + card_shown.name)
-                    result = other_player.character + " has shown a card: " + card_shown.name
-                    return result
-        result = ("No one could refute the suggestion.")
+        result = suggested_character + " has been moved to " + suggested_room
         return result
+
+    def find_refute(self, player: Player, next_player,suggested_character, suggested_weapon, suggested_room):
+        suggestion = [suggested_character, suggested_weapon, suggested_room]
+        valid_cards = []
+        if(player.name != next_player):
+            for next_player_obj in self.players:
+                if next_player_obj.name == next_player:
+                    valid_cards = next_player_obj.get_valid_card(suggestion)
+            print(" VALID CARDS FOR " + next_player + " are: ")
+            print(valid_cards)
+            if(len(valid_cards) > 0):
+                return True
+        return False
+
 
     def player_makes_accusation(self, player: Player, character, weapon, room):
         """Handle a player's accusation."""
