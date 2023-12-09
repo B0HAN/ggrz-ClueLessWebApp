@@ -1,11 +1,17 @@
+#container {
+    display: flex;
+    flex-wrap: wrap;
+    /* justify-content: center; */
+}
+
 #chatSection {
-    width: 80%; /* adjust as needed */
-    margin: 20px auto; /* centers the chat section on the page */
+    width: 40%; /* adjust as needed */
+    /* margin: 20px; centers the chat section on the page */
 }
 
 #messagesBox {
     width: 100%;
-    height: 150px; /* adjust the height as per your requirement */
+    height: 350px; /* adjust the height as per your requirement */
     border: 1px solid #ccc;
     overflow-y: auto; /* add a vertical scrollbar if messages overflow */
     margin-bottom: 10px;
@@ -14,27 +20,26 @@
 }
 
 #messageInput {
-    width: 80%; /* adjust as needed */
+    width: 87%; /* adjust as needed */
     padding: 10px;
-    margin-right: 10px; /* space between input and button */
+    /* margin-right: 10px; space between input and button */
 }
 
 button {
-    padding: 10px 20px;
+    padding: 10px 10px;
 }
 
 #gameBoard {
     display: flex;
     flex-wrap: wrap;
     width: 400px;
-    margin: 20px auto;
+    margin-left: 20px;
     font-size: 15px;
     list-style-type: none;
 }
   
 .row {
     display: flex;
-    justify-content: center;
 }
   
 .cell {
