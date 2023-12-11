@@ -18,14 +18,19 @@ def create_app():
     users_db = {}  # {username: password}
     global players_in_lobby
     players_in_lobby = []
-    global can_move
-    can_move = True
-    global can_suggest
-    can_suggest = True
     global player_suggesting
     global current_suggestion 
     player_suggesting = ""
     current_suggestion = []
+    global colors
+    colors = {
+    "Miss Scarlet": "Red",
+    "Colonel Mustard": "Yellow",
+    "Mrs. White": "White",
+    "Mr. Green": "Green",
+    "Mrs. Peacock": "Blue",
+    "Professor Plum": "Purple"
+    }
 
 
     # -----------------
@@ -66,7 +71,15 @@ def create_app():
 
     @app.route('/get_players', methods=['GET'])
     def get_players():
-        return jsonify({"players": players_in_lobby})
+        data = []
+        list_players = curr_game.players
+        for player in list_players:
+            single = []
+            single.append(player.name)
+            single.append(player.character)
+            single.append(colors[player.character])
+            data.append(single)
+        return jsonify({"players": data})
     
     @app.route('/start_game', methods=['POST'])
     def handle_start_game():
@@ -87,6 +100,7 @@ def create_app():
         #start game
         global curr_game
         curr_game = Game(players_in_lobby)
+        player = curr_game.current_player()
         #logs
         initial_game_state = curr_game.get_game_status()
         solution = curr_game.solution
@@ -99,6 +113,13 @@ def create_app():
     # -----------------
     # Socket Events
     # -----------------
+
+    @socketio.on('get_player_data')
+    def get_player_data(name):
+        for player in curr_game.players:
+            if(player.name == name):
+                emit('player_data', player.character, broadcast=True);
+
     @socketio.on('move_player')
     def valid_move(move_data):
         username = move_data['username']
@@ -112,11 +133,12 @@ def create_app():
                     emit('broadcast_message', message, broadcast=False)
                 else:
                     emit('broadcast_message', message, broadcast=True)
-                    move_data = []
-                    move_data.append(player.character)
-                    move_data.append(destination)
-                    emit('update_locations',move_data, broadcast=True )
-                    player.set_move(False)
+                    if 'cannot accommodate' not in message:
+                        move_data = []
+                        move_data.append(player.character)
+                        move_data.append(destination)
+                        emit('update_locations',move_data, broadcast=True )
+                        player.set_move(False)
             else:
                 emit('broadcast_message', 'You have already moved this turn.', broadcast=False)
         else:
@@ -129,10 +151,13 @@ def create_app():
         if(player.__str__() == username):
             curr_game.next_turn()
             new_player = curr_game.current_player()
-            message = player.name + " has ended their turn\n It is now " + new_player.name + " turn.\n"
+            message = "Player "+  player.name + " has ended their turn\n It is now player " + new_player.name + "'s turn.\n"
             emit('broadcast_message', message, broadcast=True)
+            emit('turn_data', new_player.name, broadcast=True)
+            data = [new_player.name, "It is now your turn"]
+            emit('notify_player', data, broadcast=True)
             player.set_move(True)
-            player.set_suggest(False)
+            player.set_suggest(True)
         else:
             emit('broadcast_message', 'INVALID MOVE: It is not your turn.', broadcast=False)
         game_state = curr_game.get_game_status()
@@ -151,9 +176,9 @@ def create_app():
             # players will then choose to show a card through UI
             if(player.can_suggest == True):
                 message = curr_game.player_makes_suggestion(player, suspect)
-                player.set_suggest(False)
                 if(message != "You can only make a suggestion when you are in a room."):
                     emit('broadcast_message', username + " has made an suggestion: ", broadcast=True)
+                    player.set_suggest(False)
                     emit('broadcast_message', suspect +" in the " + location +  " with a " + weapon + ".", broadcast=True)
                     emit('broadcast_message', message, broadcast=True)
                     move_data = []
@@ -169,6 +194,9 @@ def create_app():
                             player_suggesting = next_player
                             global current_suggestion
                             current_suggestion = [suspect,weapon,location]
+                            message = "Please pick a card to share with " + player.name + ". Their suggestion was " + suspect + " in the " + location +  " with a " + weapon + "."
+                            data = [player_suggesting, message]
+                            emit('notify_player', data, broadcast=True)
                             print("Refuting Player is:  " + player_suggesting)
                             break
                     
@@ -237,16 +265,23 @@ def create_app():
             #This needs to be a separate event
 
             emit('broadcast_message', message, broadcast=True)
+
         else:
             emit('broadcast_message', 'IVALID MOVE: It is not your turn.', broadcast=False)
         game_state = curr_game.get_game_status()
         print(" ========= CURRENT GAME STATE: \n")
         print(game_state)
         if curr_game.game_over == True:
-            emit('broadcast_message', 'GAME OVER', broadcast=True)
+            emit('notify_all', 'GAME OVER!\n Please refresh the page to return to lobby.', broadcast=True)
             emit('return_to_lobby', [] ,broadcast=True)
             global players_in_lobby;
             players_in_lobby = []
+        else:
+            new = curr_game.current_player()
+            end_message = "It is now player " + new.name + "'s turn."
+            data = [new.name, "It is now your turn"]
+            emit('broadcast_message', end_message, broadcast=True)
+            emit('notify_player', data, broadcast=True)
     
     @app.route('/update_list', methods=['POST'])
     def update_list():
