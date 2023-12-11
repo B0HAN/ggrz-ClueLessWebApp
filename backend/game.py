@@ -137,9 +137,10 @@ class Game:
             self.game_over = True
             result =  player.name + " has won the game!"
         else:
-             result = player.name + " has made an incorrect accusation and faces the consequences."
-             self.removePlayerfromRotation(player.name)
-
+            result = player.name + " has made an incorrect accusation and faces the consequences."
+            self.removePlayerfromRotation(player.name)
+            if(len(self.players) == 0):
+                self.game_over = True
         return result
     
     def move_player(self, player: Player, new_space_name):

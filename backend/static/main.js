@@ -24,7 +24,7 @@ var spaces = {
     "Hallway Dining Room-Kitchen": [3,4],
     "Hallway Conservatory-Ballroom":[4,1],
     "Hallway Ballroom-Kitchen": [4,3],
-}
+};
 var char_pos = {
     "Miss Scarlet": [0,3],
     "Colonel Mustard": [1,4],
@@ -32,7 +32,7 @@ var char_pos = {
     "Mr. Green": [4,1],
     "Mrs. Peacock": [3,0],
     "Professor Plum": [1,0]
-}
+};
 
 var char_name = {
     "Miss Scarlet": "scarlet",
@@ -41,7 +41,16 @@ var char_name = {
     "Mr. Green": "green",
     "Mrs. Peacock": "peacock",
     "Professor Plum": "plum"
-}
+};
+
+var char_color = {
+    "Miss Scarlet": "Red",
+    "Colonel Mustard": "Yellow",
+    "Mrs. White": "White",
+    "Mr. Green": "Green",
+    "Mrs. Peacock": "Blue",
+    "Professor Plum": "Purple"
+};
 
 //starting positions for all characters
 let scarlet_pos = [0,3];
@@ -56,6 +65,24 @@ socket.on('broadcast_message', function(data) {
     document.getElementById('messagesBox').innerHTML += '<br>' + data;
 });
 
+socket.on('notify_player', function(data){
+    var username = data[0];
+    var message = data[1];
+    if(username == currentUsername){
+        alert(message);
+    }
+});
+
+socket.on('notify_all', function(message){
+    alert(message);
+});
+
+
+socket.on('turn_data', function(data){
+    const currentPlayersTurnElement = document.getElementById("currentPlayersTurn");
+    currentPlayersTurnElement.textContent = "Current Players Turn: " + data;
+});
+
 socket.on('private_to_user', function(data) {
     let username = data[0];
     let message = data[1];
@@ -63,10 +90,8 @@ socket.on('private_to_user', function(data) {
         document.getElementById('messagesBox').innerHTML += '<br>' + message;
     }
 });
-function clearPlayerList() {
-    const playerListDiv = document.getElementById('playersList');
-    playerListDiv.innerHTML = "Lobby is currently empty!";
-}
+
+
 
 socket.on('return_to_lobby', function(){
     console.log("Returning to Lobby");
@@ -107,7 +132,7 @@ function removeDot(name) {
     const cell = document.querySelector(`.cell[data-coordinates="${cRow},${cCol}"]`);
     const dotElement = cell.querySelector(`.${name}`);
     dotElement.parentNode.removeChild(dotElement);       
-}
+};
 
 function moveCharacterDot(name, location) {
 
@@ -122,7 +147,7 @@ function moveCharacterDot(name, location) {
         
         // Append the character dot to the cell
         cell.appendChild(characterDot);
-}
+};
 
 
 // Socket event listener for player list updates
@@ -145,7 +170,7 @@ function sendMessage() {
         socket.emit('send_message', { username: currentUsername, message: message });
         document.getElementById('messageInput').value = ''; // Clear input after sending
     }
-}
+};
 
 // User Registration Function
 function registerUser() {
@@ -164,7 +189,7 @@ function registerUser() {
     .catch((error) => {
         console.error('Error:', error);
     });
-}
+};
 
 // User Login Function
 function loginUser() {
@@ -192,7 +217,7 @@ function loginUser() {
     .catch((error) => {
         console.error('Error:', error);
     });
-}
+};
 // join Function
 function join() {
     fetch('/join', { method: 'POST' })
@@ -208,7 +233,7 @@ function join() {
             console.log(data);
         }
     });
-}
+};
 
 
 
@@ -221,7 +246,7 @@ function fetchPlayersInLobby() {
     .catch((error) => {
         console.error('Error fetching players in lobby:', error);
     });
-}
+};
 
 
 
@@ -239,7 +264,7 @@ function renderLobby(playersData) {
         });
         playerListDiv.appendChild(playersList);
     }
-}
+};
 
 
 
@@ -275,17 +300,19 @@ function fetchPlayersInGame() {
 function getPlayerInGame(playersData) {
     const playerListGameDiv = document.getElementById('playersInGameList');
     playerListGameDiv.innerHTML = ""; // Clearing previous content
-    
+    const currentPlayersTurnElement = document.getElementById("currentPlayersTurn");
+    currentPlayersTurnElement.textContent = "Current Players Turn: " + currentUsername;
     if (playersData.length === 0) {
         playerListGameDiv.innerHTML = "Lobby is currently empty!";
     } else {
-        const playersInGameList = document.createElement('ul');
         playersData.forEach(player => {
-            const listItem = document.createElement('li');
-            listItem.innerHTML = player;
-            playersInGameList.appendChild(listItem);
+            var player_data = "";
+            const listItem = document.createElement('div');
+            player_data = player[0] + " --> " + player[1] + " [" + player[2] + "]"
+            listItem.classList.add('player');
+            listItem.innerHTML = player_data;
+            playerListGameDiv.appendChild(listItem);
         });
-        playerListGameDiv.appendChild(playersInGameList);
     }
 }
 
@@ -297,7 +324,7 @@ var characterData = {
     mustard: { room: char_pos["Colonel Mustard"], color: 'yellow' },
     plum: { room: char_pos["Professor Plum"], color: 'purple' },
     white: { room: char_pos["Mrs. White"], color: 'white' }
-}
+};
 
 // Get all cells on the game board
 const cells = document.querySelectorAll('.cell').forEach(cell => {
@@ -407,7 +434,7 @@ function endTurnMessage() {
 }
 
 // Sample list data
- listCards = [];
+ var listCards = [];
 
 function updateList(currUser) {
     fetch('/update_list', {
@@ -442,7 +469,7 @@ function updateList(currUser) {
             });
     })
     .catch(error => console.error('Error:', error));
-}
+};
 
 
 // Notes section
@@ -467,7 +494,7 @@ function handleCheckboxChange(event) {
     } else {
         label.style.textDecoration = 'none';
     }
-}
+};
 
 const toggleNotes = document.getElementById('toggleNotes');
 const notesSection = document.getElementById('notes');
