@@ -1,6 +1,55 @@
 // WebSocket Initialization
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 var currentUsername = "";
+var spaces = {
+    "Study": [0,0],
+    "Kitchen": [4,4],
+    "Hall": [0,2],
+    "Lounge": [0,4],
+    "Library": [2,0],
+    "Billiard Room": [2,2],
+    "Dining Room": [2,4],
+    "Conservatory": [4,0],
+    "Ballroom": [4,2],
+    "Hallway Study-Hall": [0,1],
+    "Hallway Study-Library": [1,0],
+    "Hallway Hall-Lounge": [0,3],
+    "Hallway Hall-Billiard Room": [1,2],
+    "Hallway Lounge-Dining Room": [1,4],
+    "Hallway Library-Billiard Room": [2,1],
+    "Hallway Billiard Room-Dining Room": [2,3],
+    "Hallway Library-Conservatory": [3,0],
+    "Hallway Billiard Room-Ballroom": [3,2],
+    "Hallway Dining Room-Kitchen": [3,4],
+    "Hallway Conservatory-Ballroom":[4,1],
+    "Hallway Ballroom-Kitchen": [4,3],
+}
+var char_pos = {
+    "Miss Scarlet": [0,3],
+    "Colonel Mustard": [1,4],
+    "Mrs. White": [4,3],
+    "Mr. Green": [4,1],
+    "Mrs. Peacock": [3,0],
+    "Professor Plum": [1,0]
+}
+
+var char_name = {
+    "Miss Scarlet": "scarlet",
+    "Colonel Mustard": "mustard",
+    "Mrs. White": "white",
+    "Mr. Green": "green",
+    "Mrs. Peacock": "peacock",
+    "Professor Plum": "plum"
+}
+
+//starting positions for all characters
+let scarlet_pos = [0,3];
+let peacock_pos = [3,0];
+let green_pos = [4,1];
+let mustard_pos = [1,4];
+let plum_pos = [1,0];
+let white_pos = [4,3];
+
 
 socket.on('broadcast_message', function(data) {
     document.getElementById('messagesBox').innerHTML += '<br>' + data;
@@ -14,7 +63,40 @@ socket.on('private_to_user', function(data) {
     }
 });
 
+socket.on('update_locations', function(data) {
+    var n = data[0]
+    var character_name = char_name[n];
+    var location_coordinate = spaces[data[1]];
+    var position = characterData[character_name];
+    console.log("Moving Data Name: " + character_name + " Location:" + location_coordinate);
+    removeDot(character_name);
+    position.room = location_coordinate;
+    moveCharacterDot(character_name, location_coordinate);
+});
 
+function removeDot(name) {
+    const characterPosition = characterData[name];
+    const [cRow, cCol] = characterPosition.room;
+    // Get the parent element
+    const cell = document.querySelector(`.cell[data-coordinates="${cRow},${cCol}"]`);
+    const dotElement = cell.querySelector(`.${name}`);
+    dotElement.parentNode.removeChild(dotElement);       
+}
+
+function moveCharacterDot(name, location) {
+
+        const characterPosition = characterData[name];
+        const [cRow, cCol] = location;
+        // Find the cell with matching coordinates
+        const cell = document.querySelector(`.cell[data-coordinates="${cRow},${cCol}"]`);
+        // Create a character dot element
+        const characterDot = document.createElement('div');
+        characterDot.classList.add('character-dot', name);
+        characterDot.style.backgroundColor = characterPosition.color;
+        
+        // Append the character dot to the cell
+        cell.appendChild(characterDot);
+}
 
 
 // Socket event listener for player list updates
@@ -25,7 +107,6 @@ socket.on('players_update', function(updatedPlayers) {
 
 socket.on('game_started', function() {
     document.getElementById('lobbySection').style.display = 'none';
-    document.getElementById('chatSection').style.display = 'none';
     document.getElementById('gameSection').style.display = 'block';
     fetchPlayersInGame();
     updateList(currentUsername);
@@ -182,13 +263,14 @@ function getPlayerInGame(playersData) {
     }
 }
 
-const characterData = {
-    scarlet: { room: [0, 0], color: 'red' },
-    peacock: { room: [0, 2], color: 'blue' },
-    green: { room: [2, 2], color: 'green' },
-    mustard: { room: [4, 4], color: 'yellow' },
-    plum: { room: [4, 4], color: 'purple' },
-    white: { room: [4, 4], color: 'white' }
+
+var characterData = {
+    scarlet: { room: char_pos["Miss Scarlet"], color: 'red' },
+    peacock: { room: char_pos["Mrs. Peacock"], color: 'blue' },
+    green: { room: char_pos["Mr. Green"], color: 'green' },
+    mustard: { room: char_pos["Colonel Mustard"], color: 'yellow' },
+    plum: { room: char_pos["Professor Plum"], color: 'purple' },
+    white: { room: char_pos["Mrs. White"], color: 'white' }
 }
 
 // Get all cells on the game board
@@ -203,13 +285,12 @@ const cells = document.querySelectorAll('.cell').forEach(cell => {
         const [cRow, cCol] = characterPosition.room;
         // Find the cell with matching coordinates
         const cell = document.querySelector(`.cell[data-coordinates="${cRow},${cCol}"]`);
-
+        console.log(cell)
         if (cell && !cell.querySelector(`.character-dot.${character}`)) {
             // Create a character dot element
             const characterDot = document.createElement('div');
             characterDot.classList.add('character-dot', character);
             characterDot.style.backgroundColor = characterPosition.color;
-        
             // Append the character dot to the cell
             cell.appendChild(characterDot);
           }

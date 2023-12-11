@@ -8,6 +8,7 @@ class Player:
         self.character = character
         self.current_space = Space("None", "None")
         self.can_move = True
+        self.can_suggest = True
 
     def receive_card(self, card: Card):
         """Add a card to the player's hand."""
@@ -34,6 +35,8 @@ class Player:
     
     def set_move(self, state):
         self.can_move = state
+    def set_suggest(self, state):
+        self.can_suggest = state
 
     def get_cards(self):
         list_cards = self.hand
