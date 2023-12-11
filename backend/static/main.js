@@ -1,6 +1,7 @@
 // WebSocket Initialization
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 var currentUsername = "";
+var newGame = false;
 var spaces = {
     "Study": [0,0],
     "Kitchen": [4,4],
@@ -62,13 +63,38 @@ socket.on('private_to_user', function(data) {
         document.getElementById('messagesBox').innerHTML += '<br>' + message;
     }
 });
+function clearPlayerList() {
+    const playerListDiv = document.getElementById('playersList');
+    playerListDiv.innerHTML = "Lobby is currently empty!";
+}
+
+socket.on('return_to_lobby', function(){
+    console.log("Returning to Lobby");
+    newGame = true;
+    
+    const playerListDiv = document.getElementById('playersList');
+    
+    // Check if the 'playersList' element exists
+    if (playerListDiv) {
+        // Remove all <li> elements
+        const liElements = playerListDiv.querySelectorAll('li');
+        liElements.forEach(function(liElement) {
+            liElement.parentNode.removeChild(liElement);
+            console.log("removed a child");
+        });
+
+        // Render the lobby with an empty array
+        renderLobby([]);
+    } else {
+        console.error("Element with ID 'playersList' not found.");
+    }
+});
 
 socket.on('update_locations', function(data) {
     var n = data[0]
     var character_name = char_name[n];
     var location_coordinate = spaces[data[1]];
     var position = characterData[character_name];
-    console.log("Moving Data Name: " + character_name + " Location:" + location_coordinate);
     removeDot(character_name);
     position.room = location_coordinate;
     moveCharacterDot(character_name, location_coordinate);
@@ -185,6 +211,7 @@ function join() {
 }
 
 
+
 function fetchPlayersInLobby() {
     fetch('/get_players')
     .then(response => response.json())
@@ -201,8 +228,7 @@ function fetchPlayersInLobby() {
 function renderLobby(playersData) {
     const playerListDiv = document.getElementById('playersList');
     playerListDiv.innerHTML = ""; // Clearing previous content
-    
-    if (playersData.length === 0) {
+    if (playersData.length == 0) {
         playerListDiv.innerHTML = "Lobby is currently empty!";
     } else {
         const playersList = document.createElement('ul');
@@ -285,7 +311,6 @@ const cells = document.querySelectorAll('.cell').forEach(cell => {
         const [cRow, cCol] = characterPosition.room;
         // Find the cell with matching coordinates
         const cell = document.querySelector(`.cell[data-coordinates="${cRow},${cCol}"]`);
-        console.log(cell)
         if (cell && !cell.querySelector(`.character-dot.${character}`)) {
             // Create a character dot element
             const characterDot = document.createElement('div');

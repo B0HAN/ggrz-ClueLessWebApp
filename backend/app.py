@@ -16,6 +16,7 @@ def create_app():
 
     # In-memory databases
     users_db = {}  # {username: password}
+    global players_in_lobby
     players_in_lobby = []
     global can_move
     can_move = True
@@ -243,6 +244,9 @@ def create_app():
         print(game_state)
         if curr_game.game_over == True:
             emit('broadcast_message', 'GAME OVER', broadcast=True)
+            emit('return_to_lobby', [] ,broadcast=True)
+            global players_in_lobby;
+            players_in_lobby = []
     
     @app.route('/update_list', methods=['POST'])
     def update_list():
