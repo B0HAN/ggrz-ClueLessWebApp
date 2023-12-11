@@ -9,7 +9,9 @@
     <script type="text/javascript">var staticBasePath = "{{ url_for('static', filename='') }}";</script>
 </head>
 <body>
-    <h1>GGRZ Clue-Less</h1>
+    <div id="header" style="display: block;">
+        <h1>GGRZ Clue-Less</h1>
+    </div>
     <!-- User Registration and Login Section -->
     <div id="userSection">
         <input type="text" id="usernameInput" placeholder="Username">
@@ -27,8 +29,7 @@
         <button id="startButton" onclick="startGame()">Start</button>
         <div id="playersList"></div>
     </div>
-
-    <!-- Chat Section -->
+    
     <div id="chatSection" style="display: none; ">
         <!-- This is the message box where messages will be displayed -->
         <div id="messagesBox"></div>
@@ -38,19 +39,16 @@
                 <!-- This is the input area and button, placed outside the message box -->
                 <input type="text" id="messageInput" placeholder="Enter your message">
             </div>
-            <div style="flex-grow: 0">
+            <div style="flex-grow: 1">
                 <button onclick="sendMessage()">Send Message</button>
             </div>
         </div>
-    </div>
-
+    </div>    
+    
     <!-- Game Section -->
     <div id="gameSection" style="display: none;">
-
-        <h2>Welcome to the Game!</h2>
-    
         <!-- Game content -->
-        <div class="message-game-combo" style="display: flex;">\
+        <div class="message-game-combo" style="display: flex;">
             <div id="gameBoard" style="flex-grow: 1">
                 <li>
                     <div class="row">
@@ -91,6 +89,7 @@
                 </li>
             </div>
         </div>
+    
         <div class="game-content" style="display: flex;">
             <div style="flex-grow: 1">
                 <h3>Game Instructions:</h3>
@@ -141,44 +140,6 @@
                 <h3>Your Cards:</h3>
                 <ul id="listCardsContainer"></ul>
                 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    
-                <script>
-                    // Function to update the list using AJAX
-                    function updateList() {
-                        fetch('/update_list')
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log('Received data:', data.data);
-                            
-                                // Update the frontend list display
-                                listCards = data.data;
-
-                                // Clear the existing list items
-                                const listCardsContainer = document.getElementById('listCardsContainer');
-                                listCardsContainer.innerHTML = '';
-
-                                // Generate the list and populate it in the container
-                                listCards.forEach(card => {
-                                    const li = document.createElement('li');
-                                    li.textContent = card;
-                    
-                                    // Add click event listener to each list item
-                                    li.addEventListener('click', () => {
-                                        var message = 'Clicked on ' + card;
-                                        socket.emit('send_message', { username: currentUsername, message: message });
-                                    });
-                    
-                                    listCardsContainer.appendChild(li);
-                                });
-                        })
-                        .catch(error => console.error('Error:', error));
-                    }
-            
-                    // Call the updateList function on page load or in response to some event
-                    $(document).ready(function() {
-                        updateList();
-                    });
-                </script>
             </div>
 
             <div style="flex-grow: .7">

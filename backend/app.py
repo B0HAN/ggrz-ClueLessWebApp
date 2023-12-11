@@ -132,13 +132,15 @@ def create_app():
                 if "is not a valid" in message or 'You are' in message:
                     emit('broadcast_message', message, broadcast=False)
                 else:
-                    emit('broadcast_message', message, broadcast=True)
+                    emit('broadcast_message', message, broadcast=False)
                     if 'cannot accommodate' not in message:
                         move_data = []
                         move_data.append(player.character)
                         move_data.append(destination)
                         emit('update_locations',move_data, broadcast=True )
                         player.set_move(False)
+                    else:
+                        emit('broadcast_message', message, broadcast=False)
             else:
                 emit('broadcast_message', 'You have already moved this turn.', broadcast=False)
         else:

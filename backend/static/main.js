@@ -158,7 +158,9 @@ socket.on('players_update', function(updatedPlayers) {
 
 socket.on('game_started', function() {
     document.getElementById('lobbySection').style.display = 'none';
-    document.getElementById('gameSection').style.display = 'block';
+    document.getElementById('header').style.display = 'none';
+    document.getElementById('gameSection').style.display = 'inline';
+    document.getElementById('chatSection').style.display = 'inline';
     fetchPlayersInGame();
     updateList(currentUsername);
 });
