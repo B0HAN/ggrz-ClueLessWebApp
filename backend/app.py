@@ -19,6 +19,8 @@ def create_app():
     players_in_lobby = []
     global can_move
     can_move = True
+    global can_suggest
+    can_suggest = True
     global player_suggesting
     global current_suggestion 
     player_suggesting = ""
@@ -109,6 +111,10 @@ def create_app():
                     emit('broadcast_message', message, broadcast=False)
                 else:
                     emit('broadcast_message', message, broadcast=True)
+                    move_data = []
+                    move_data.append(player.character)
+                    move_data.append(destination)
+                    emit('update_locations',move_data, broadcast=True )
                     player.set_move(False)
             else:
                 emit('broadcast_message', 'You have already moved this turn.', broadcast=False)
@@ -125,6 +131,7 @@ def create_app():
             message = player.name + " has ended their turn\n It is now " + new_player.name + " turn.\n"
             emit('broadcast_message', message, broadcast=True)
             player.set_move(True)
+            player.set_suggest(False)
         else:
             emit('broadcast_message', 'INVALID MOVE: It is not your turn.', broadcast=False)
         game_state = curr_game.get_game_status()
@@ -141,26 +148,34 @@ def create_app():
         if(player.__str__() == username):
             # These events need to happen sepeerately in the future, since after a suggestion is made
             # players will then choose to show a card through UI
-            message = curr_game.player_makes_suggestion(player, suspect)
-            if(message != "You can only make a suggestion when you are in a room."):
-                emit('broadcast_message', username + " has made an suggestion: ", broadcast=True)
-                emit('broadcast_message', suspect +" in the " + location +  " with a " + weapon + ".", broadcast=True)
-                emit('broadcast_message', message, broadcast=True)
-                result_message = "No one could refute this claim!"
-                for next_player in players_in_lobby:
-                    has_card = curr_game.find_refute(player,next_player,suspect,weapon,location)
-                    if(has_card):
-                        result_message = next_player + " is picking a card."
-                        global player_suggesting
-                        player_suggesting = next_player
-                        global current_suggestion
-                        current_suggestion = [suspect,weapon,location]
-                        print("Refuting Player is:  " + player_suggesting)
-                        break
-                
-                emit('broadcast_message', result_message, broadcast=True)
+            if(player.can_suggest == True):
+                message = curr_game.player_makes_suggestion(player, suspect)
+                player.set_suggest(False)
+                if(message != "You can only make a suggestion when you are in a room."):
+                    emit('broadcast_message', username + " has made an suggestion: ", broadcast=True)
+                    emit('broadcast_message', suspect +" in the " + location +  " with a " + weapon + ".", broadcast=True)
+                    emit('broadcast_message', message, broadcast=True)
+                    move_data = []
+                    move_data.append(suspect)
+                    move_data.append(location)
+                    emit('update_locations',move_data, broadcast=True )
+                    result_message = "No one could refute this claim!"
+                    for next_player in players_in_lobby:
+                        has_card = curr_game.find_refute(player,next_player,suspect,weapon,location)
+                        if(has_card):
+                            result_message = next_player + " is picking a card."
+                            global player_suggesting
+                            player_suggesting = next_player
+                            global current_suggestion
+                            current_suggestion = [suspect,weapon,location]
+                            print("Refuting Player is:  " + player_suggesting)
+                            break
+                    
+                    emit('broadcast_message', result_message, broadcast=True)
+                else:
+                    emit('broadcast_message', message, broadcast=False)
             else:
-                emit('broadcast_message', message, broadcast=False)
+                emit('broadcast_message', "You have already made a suggestion this turn.", broadcast=False)
 
              #This message broadcasts the card that is shown
             #emit('broadcast_message', message, broadcast=False)
